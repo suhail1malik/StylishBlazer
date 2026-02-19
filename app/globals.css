@@ -1,26 +1,95 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Brand Colors - Enhanced with explicit declarations */
+  --color-brand-50: #f0fdf4;
+  --color-brand-100: #dcfce7;
+  --color-brand-200: #bbf7d0;
+  --color-brand-300: #86efac;
+  --color-brand-400: #4ade80;
+  --color-brand-500: #22c55e;
+  --color-brand-600: #16a34a;
+  --color-brand-700: #15803d;
+  --color-brand-800: #166534;
+  --color-brand-900: #14532d;
+
+  /* Text color utilities (explicit mapping) */
+  --color-text-brand-700: #15803d;
+  --color-text-brand-800: #166534;
+  --color-text-brand-900: #14532d;
+
+  /* Background color utilities */
+  --color-bg-brand-50: #f0fdf4;
+  --color-bg-brand-100: #dcfce7;
+  --color-bg-brand-600: #16a34a;
+
+  /* Border color utilities */
+  --color-border-brand-300: #86efac;
+  --color-border-brand-400: #4ade80;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+::-webkit-scrollbar-track {
+  background: #f4f4f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #a1a1aa;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #71717a;
+}
+
+/* Focus visible styles */
+*:focus-visible {
+  outline: 2px solid #22c55e;
+  outline-offset: 2px;
+}
+
+/* Smooth transitions */
+a,
+button,
+input,
+textarea,
+select {
+  transition-property:
+    color, background-color, border-color, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Fallback: Direct utility classes (agar @theme fail ho) */
+.text-brand-700 {
+  color: #15803d !important;
+}
+
+.text-brand-800 {
+  color: #166534 !important;
+}
+
+.text-brand-900 {
+  color: #14532d !important;
+}
+
+.bg-brand-100 {
+  background-color: #dcfce7 !important;
+}
+
+.border-brand-300 {
+  border-color: #86efac !important;
+}
+
+.border-brand-400 {
+  border-color: #4ade80 !important;
 }

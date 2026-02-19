@@ -1,0 +1,34 @@
+// prisma/seed-admin.ts
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+
+const prisma = new PrismaClient();
+
+async function main() {
+  // Password hash karo
+  const hashedPassword = await bcrypt.hash('admin123', 10);
+  
+  // Admin user create/update karo
+  const admin = await prisma.admin.upsert({
+    where: { email: 'admin@looklikestitches.com' },
+    update: {},
+    create: {
+      email: 'admin@looklikestitches.com',
+      password: hashedPassword,
+      name: 'Admin User',
+    },
+  });
+
+  console.log('✅ Admin user created:', admin.email);
+  console.log('📧 Email: admin@looklikestitches.com');
+  console.log('🔑 Password: admin123');
+}
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

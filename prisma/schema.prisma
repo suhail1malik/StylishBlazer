@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// Category Model
+model Category {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  slug        String    @unique
+  description String
+  image       String?
+  isActive    Boolean   @default(true)
+  order       Int       @default(0)
+  
+  products    Product[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// Product Model
+model Product {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  slug             String   @unique
+  shortDescription String
+  description      String?
+  price            Int?
+  images           String[]
+  sizes            String[] @default([])
+  tags             String[] @default([])
+  isActive         Boolean  @default(true)
+  isFeatured       Boolean  @default(false)
+  
+  categoryId       String   @db.ObjectId
+  category         Category @relation(fields: [categoryId], references: [id])
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  @@index([categoryId])
+}
+
+// Page Model
+model Page {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug      String   @unique
+  title     String
+  content   String
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Enquiry Model
+model Enquiry {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String
+  phone       String
+  message     String
+  productSlug String?
+  status      String   @default("new")
+  
+  createdAt   DateTime @default(now())
+}
+
+// Admin User Model
+model AdminUser {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  password  String
+  name      String
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
