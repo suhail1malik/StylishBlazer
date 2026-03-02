@@ -8,15 +8,15 @@ import DeleteProductButton from "@/components/admin/DeleteProductButton";
 type Product = {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
+  shortDescription: string;
   images: string[];
-  price: number;
-  originalPrice?: number;
-  stock: number;
-  featured: boolean;
-  category?: {
+  price: number | null;
+  isActive: boolean;
+  isFeatured: boolean;
+  category: {
     name: string;
-  } | null;
+  };
 };
 
 export default async function AdminProductsPage() {
@@ -69,7 +69,7 @@ export default async function AdminProductsPage() {
                     Price
                   </th>
                   <th className="text-left px-6 py-3 text-gray-600 font-semibold">
-                    Stock
+                    Status
                   </th>
                   <th className="text-left px-6 py-3 text-gray-600 font-semibold">
                     Featured
@@ -122,37 +122,34 @@ export default async function AdminProductsPage() {
                     {/* Price */}
                     <td className="px-6 py-4">
                       <div>
-                        <p className="font-semibold text-gray-900">
-                          ₹{product.price.toLocaleString()}
-                        </p>
-                        {product.originalPrice && (
-                          <p className="text-xs text-gray-400 line-through">
-                            ₹{product.originalPrice.toLocaleString()}
+                        {product.price !== null ? (
+                          <p className="font-semibold text-gray-900">
+                            ₹{product.price.toLocaleString()}
+                          </p>
+                        ) : (
+                          <p className="text-sm text-gray-500 italic">
+                            Price not set
                           </p>
                         )}
                       </div>
                     </td>
 
-                    {/* Stock */}
+                    {/* Status */}
                     <td className="px-6 py-4">
                       <span
                         className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                          product.stock > 10
+                          product.isActive
                             ? "bg-green-50 text-green-700"
-                            : product.stock > 0
-                              ? "bg-yellow-50 text-yellow-700"
-                              : "bg-red-50 text-red-700"
+                            : "bg-gray-50 text-gray-700"
                         }`}
                       >
-                        {product.stock > 0
-                          ? `${product.stock} in stock`
-                          : "Out of stock"}
+                        {product.isActive ? "Active" : "Inactive"}
                       </span>
                     </td>
 
                     {/* Featured */}
                     <td className="px-6 py-4">
-                      {product.featured ? (
+                      {product.isFeatured ? (
                         <span className="text-yellow-500 text-lg">⭐</span>
                       ) : (
                         <span className="text-gray-300 text-lg">☆</span>

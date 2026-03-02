@@ -113,12 +113,14 @@ export default async function ProductPage({ params }: Props) {
               </p>
 
               {/* Price */}
-              <div className="mt-6 flex items-baseline gap-3">
-                <p className="text-4xl font-bold text-brand-600">
-                  ₹{product.price.toLocaleString("en-IN")}
-                </p>
-                <p className="text-sm text-zinc-500">per piece</p>
-              </div>
+              {product.price !== null && (
+                <div className="mt-6 flex items-baseline gap-3">
+                  <p className="text-4xl font-bold text-brand-600">
+                    ₹{product.price.toLocaleString("en-IN")}
+                  </p>
+                  <p className="text-sm text-zinc-500">per piece</p>
+                </div>
+              )}
 
               {/* Tags */}
               {product.tags && product.tags.length > 0 && (

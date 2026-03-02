@@ -7,9 +7,9 @@ const prisma = new PrismaClient();
 async function main() {
   // Password hash karo
   const hashedPassword = await bcrypt.hash('admin123', 10);
-  
+
   // Admin user create/update karo
-  const admin = await prisma.admin.upsert({
+  const admin = await prisma.adminUser.upsert({
     where: { email: 'admin@StylishBlazer.com' },
     update: {},
     create: {

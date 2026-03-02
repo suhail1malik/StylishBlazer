@@ -36,10 +36,15 @@ type Product = {
 
 async function getCategories(): Promise<Category[]> {
   try {
-    return await prisma.category.findMany({
+    const categories = await prisma.category.findMany({
       orderBy: { order: "asc" },
       include: { _count: { select: { products: true } } },
     });
+    // Add isNew property (customize logic as needed)
+    return categories.map((category) => ({
+      ...category,
+      isNew: false, // or your logic to determine if it's new
+    }));
   } catch (error) {
     console.error("Error fetching categories:", error);
     return [];
@@ -48,12 +53,20 @@ async function getCategories(): Promise<Category[]> {
 
 async function getFeaturedProducts(): Promise<Product[]> {
   try {
-    return await prisma.product.findMany({
+    const products = await prisma.product.findMany({
       where: { isFeatured: true, isActive: true },
       include: { category: true },
       orderBy: { createdAt: "desc" },
       take: 4,
     });
+
+    // Ensure price is never null
+    return products
+      .filter((p) => p.price !== null)
+      .map((p) => ({
+        ...p,
+        price: p.price ?? 0, // fallback to 0 if price is somehow null
+      })) as Product[];
   } catch (error) {
     console.error("Error fetching products:", error);
     return [];
@@ -69,7 +82,7 @@ export default async function Home() {
   const heroProducts = featuredProducts.map((p) => ({
     id: p.id,
     name: p.name,
-    shortDescription: p.shortDescription,
+    shortDescription: p.shortDescription ?? "",
     images: p.images,
     slug: p.slug,
   }));
