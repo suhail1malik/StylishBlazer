@@ -57,18 +57,19 @@ model Page {
   updatedAt DateTime @updatedAt
 }
 
-// Enquiry Model
 model Enquiry {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   email       String
   phone       String
+  productName String?
   message     String
-  productSlug String?
-  status      String   @default("new")
-  
+  status      String   @default("new")  // new | replied | closed
+  source      String   @default("contact") // contact | product
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
+
 
 // Admin User Model
 model AdminUser {

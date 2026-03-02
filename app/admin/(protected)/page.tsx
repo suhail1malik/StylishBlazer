@@ -23,7 +23,7 @@ export default async function AdminDashboard() {
           Dashboard Overview
         </h1>
         <p className="text-slate-600">
-          Welcome back! Here's what's happening with your store.
+          Welcome back! Here&#39;s what&#39;s happening with your store.
         </p>
       </div>
 

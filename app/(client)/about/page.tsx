@@ -4,7 +4,10 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About Us",
   description:
-    "LookLikeStitches is a leading manufacturer of premium women long coats, mens blazers and woolen outerwear based in Chandigarh, India.",
+    "Learn about StylishBlazer — a premium manufacturer of women coats and mens blazers based in India.",
+  alternates: {
+    canonical: "https://stylishblazer.in/about",
+  },
 };
 
 export default function AboutPage() {
@@ -14,7 +17,7 @@ export default function AboutPage() {
       <section className="border-b border-zinc-200 bg-white py-16">
         <div className="mx-auto max-w-4xl px-4 text-center lg:px-6">
           <p className="text-xs font-semibold uppercase tracking-wider text-brand-600">
-            About LookLikeStitches
+            About StylishBlazer
           </p>
           <h1 className="mt-3 text-3xl font-bold tracking-tight text-zinc-900 md:text-4xl">
             Crafting Premium Outerwear Since 2010
@@ -58,11 +61,11 @@ export default function AboutPage() {
         <div className="mx-auto max-w-4xl px-4 lg:px-6">
           <div className="space-y-6 text-base leading-relaxed text-zinc-700">
             <p>
-              LookLikeStitches was founded in 2010 with a vision to bring
-              premium quality outerwear manufacturing to the Indian market. What
-              started as a small workshop in Chandigarh has grown into a
-              full-scale manufacturing unit serving retailers and brands across
-              the country.
+              StylishBlazer was founded in 2010 with a vision to bring premium
+              quality outerwear manufacturing to the Indian market. What started
+              as a small workshop in Chandigarh has grown into a full-scale
+              manufacturing unit serving retailers and brands across the
+              country.
             </p>
             <p>
               Our team of skilled craftsmen and designers work together to

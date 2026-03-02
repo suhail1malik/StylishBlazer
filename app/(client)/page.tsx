@@ -1,9 +1,18 @@
-// app/page.tsx
 import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import HeroSlider from "@/components/HeroSlider";
+import type { Metadata } from "next";
 
-// Type Definitions
+export const metadata: Metadata = {
+  title: "Premium Women Coats & Mens Blazers Manufacturer",
+  description:
+    "StylishBlazer manufactures premium women coats, woolen jackets, and mens blazers. Wholesale & bulk orders from India.",
+  alternates: {
+    canonical: "https://stylishblazer.in",
+  },
+};
+
 type Category = {
   id: string;
   name: string;
@@ -11,9 +20,7 @@ type Category = {
   description: string | null;
   order: number;
   isNew: boolean;
-  _count: {
-    products: number;
-  };
+  _count: { products: number };
 };
 
 type Product = {
@@ -24,23 +31,15 @@ type Product = {
   price: number;
   isFeatured: boolean;
   images: string[];
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-  };
+  category: { id: string; name: string; slug: string };
 };
 
-// Server Functions
 async function getCategories(): Promise<Category[]> {
   try {
-    const categories = await prisma.category.findMany({
+    return await prisma.category.findMany({
       orderBy: { order: "asc" },
-      include: {
-        _count: { select: { products: true } },
-      },
+      include: { _count: { select: { products: true } } },
     });
-    return categories;
   } catch (error) {
     console.error("Error fetching categories:", error);
     return [];
@@ -49,13 +48,12 @@ async function getCategories(): Promise<Category[]> {
 
 async function getFeaturedProducts(): Promise<Product[]> {
   try {
-    const products = await prisma.product.findMany({
-      where: { isFeatured: true },
+    return await prisma.product.findMany({
+      where: { isFeatured: true, isActive: true },
       include: { category: true },
       orderBy: { createdAt: "desc" },
       take: 4,
     });
-    return products;
   } catch (error) {
     console.error("Error fetching products:", error);
     return [];
@@ -68,15 +66,28 @@ export default async function Home() {
     getFeaturedProducts(),
   ]);
 
+  const heroProducts = featuredProducts.map((p) => ({
+    id: p.id,
+    name: p.name,
+    shortDescription: p.shortDescription,
+    images: p.images,
+    slug: p.slug,
+  }));
+
   return (
     <main className="min-h-screen">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 text-white py-12 sm:py-16 md:py-20">
-        <div className="container mx-auto px-4">
+      {/* ✅ Hero Section - Same design + HeroSlider */}
+      <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 text-white py-12 sm:py-16 md:py-20 overflow-hidden">
+        {/* Glow effects */}
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-emerald-500/20 blur-[120px] rounded-full hidden lg:block pointer-events-none" />
+        <div className="absolute left-0 bottom-0 w-[250px] h-[250px] bg-emerald-700/10 blur-[100px] rounded-full hidden lg:block pointer-events-none" />
+
+        <div className="container mx-auto px-4 relative z-10">
           <div className="grid md:grid-cols-2 gap-8 items-center">
+            {/* Left - Text (same as before) */}
             <div>
               <span className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-sm mb-4">
-                <span className="w-2 h-2 bg-emerald-400 rounded-full"></span>
+                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
                 Premium Outerwear Manufacturer
               </span>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-6">
@@ -86,41 +97,50 @@ export default async function Home() {
                 </span>
               </h1>
               <p className="text-slate-300 text-base md:text-lg mb-6 md:mb-8">
-                LookLikeStitches manufactures high-quality women long coats,
-                mens blazers and custom woolen outerwear for retailers, brands
-                and corporate clients across India.
+                StylishBlazer manufactures high-quality women long coats, mens
+                blazers and custom woolen outerwear for retailers, brands and
+                corporate clients across India.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/products?category=women-long-coats"
+                  href="/category/women-long-coats"
                   className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition text-center"
                 >
                   View Women Collection
                 </Link>
                 <Link
-                  href="/products?category=mens-blazers"
+                  href="/category/mens-blazers"
                   className="border-2 border-white/30 hover:bg-white/10 text-white px-6 py-3 rounded-lg font-medium transition text-center"
                 >
                   Explore Mens Blazers
                 </Link>
               </div>
             </div>
+
+            {/* Right - HeroSlider (placeholder ki jagah) */}
             <div className="flex justify-center">
-              <div className="bg-slate-700/50 backdrop-blur rounded-2xl p-8 w-full max-w-md">
-                <div className="bg-slate-600/50 rounded-xl h-64 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-6xl mb-4">🛍️</div>
-                    <p className="text-slate-300">Premium Product Image</p>
-                    <p className="text-slate-400 text-sm">Coming Soon</p>
+              <div className="w-full max-w-md">
+                {heroProducts.length > 0 ? (
+                  <HeroSlider products={heroProducts} />
+                ) : (
+                  // Fallback - same as before
+                  <div className="bg-slate-700/50 backdrop-blur rounded-2xl p-8 w-full">
+                    <div className="bg-slate-600/50 rounded-xl h-64 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-6xl mb-4">🛍️</div>
+                        <p className="text-slate-300">Premium Product Image</p>
+                        <p className="text-slate-400 text-sm">Coming Soon</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* Stats Section - SAME */}
       <section className="bg-slate-900 text-white py-8">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-3 gap-4 text-center">
@@ -150,7 +170,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section - SAME */}
       <section className="py-12 md:py-16 bg-slate-50">
         <div className="container mx-auto px-4">
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
@@ -187,7 +207,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Categories Section - DYNAMIC */}
+      {/* Categories Section - SAME */}
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8 md:mb-12">
@@ -202,7 +222,6 @@ export default async function Home() {
               and customers.
             </p>
           </div>
-
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
             {categories.map((category) => (
               <Link
@@ -229,9 +248,9 @@ export default async function Home() {
                   <span className="text-slate-500">
                     {category._count.products} styles
                   </span>
-                  <span className="text-emerald-600 font-medium group-hover:gap-2 flex items-center gap-1 transition-all">
+                  <span className="text-emerald-600 font-medium flex items-center gap-1">
                     Explore{" "}
-                    <span className="group-hover:translate-x-1 transition-transform">
+                    <span className="group-hover:translate-x-1 transition-transform inline-block">
                       →
                     </span>
                   </span>
@@ -242,7 +261,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Featured Products Section - DYNAMIC */}
+      {/* Featured Products - SAME */}
       <section className="py-12 md:py-16 bg-slate-50">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
@@ -256,25 +275,21 @@ export default async function Home() {
             </div>
             <Link
               href="/products"
-              className="text-emerald-600 font-medium hover:gap-2 flex items-center gap-1 transition-all"
+              className="text-emerald-600 font-medium flex items-center gap-1"
             >
-              View All{" "}
-              <span className="group-hover:translate-x-1 transition-transform">
-                →
-              </span>
+              View All <span className="inline-block">→</span>
             </Link>
           </div>
-
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {featuredProducts.map((product) => (
               <Link
                 key={product.id}
                 href={`/products/${product.slug}`}
                 className="group bg-white rounded-xl overflow-hidden hover:shadow-lg transition"
               >
-                <div className="relative bg-slate-100 h-48 flex items-center justify-center">
+                <div className="relative bg-slate-100 aspect-[3/4]">
                   {product.isFeatured && (
-                    <span className="absolute top-3 left-3 bg-emerald-600 text-white text-xs px-2 py-1 rounded-full">
+                    <span className="absolute top-2 left-2 z-10 bg-emerald-600 text-white text-xs px-2 py-0.5 rounded-full">
                       Featured
                     </span>
                   )}
@@ -286,23 +301,25 @@ export default async function Home() {
                       className="object-cover"
                     />
                   ) : (
-                    <div className="text-4xl">👔</div>
+                    <div className="w-full h-full flex items-center justify-center text-4xl">
+                      👔
+                    </div>
                   )}
                 </div>
-                <div className="p-4">
-                  <h3 className="font-semibold mb-1 group-hover:text-emerald-600 transition">
+                <div className="p-3 md:p-4">
+                  <h3 className="font-semibold text-sm md:text-base mb-1 group-hover:text-emerald-600 transition line-clamp-1">
                     {product.name}
                   </h3>
-                  <p className="text-slate-600 text-sm mb-3 line-clamp-2">
+                  <p className="text-slate-600 text-xs md:text-sm mb-2 line-clamp-2">
                     {product.shortDescription}
                   </p>
                   <div className="flex items-center justify-between">
-                    <span className="text-emerald-600 font-bold text-lg">
-                      ₹{product.price.toLocaleString()}
+                    <span className="text-emerald-600 font-bold text-sm md:text-lg">
+                      ₹{product.price?.toLocaleString()}
                     </span>
-                    <button className="text-emerald-600 hover:bg-emerald-50 px-3 py-1 rounded text-sm font-medium transition">
+                    <span className="text-emerald-600 text-xs md:text-sm font-medium">
                       Enquire →
-                    </button>
+                    </span>
                   </div>
                 </div>
               </Link>
@@ -311,7 +328,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA - SAME */}
       <section className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-12 md:py-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">

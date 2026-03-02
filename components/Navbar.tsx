@@ -73,7 +73,7 @@ export function Navbar() {
           {/* Brand Name */}
           <div className="hidden sm:flex flex-col leading-none">
             <span className="text-lg font-bold tracking-tight text-zinc-900 transition-colors group-hover:text-brand-600">
-              LookLike<span className="text-brand-600">Stitches</span>
+              Stylish<span className="text-brand-600">Blazer</span>
             </span>
             <span className="text-[9px] font-medium tracking-widest text-zinc-500 uppercase mt-0.5">
               Premium Outerwear
@@ -90,6 +90,15 @@ export function Navbar() {
             Home
             <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-brand-600 transition-all group-hover:w-full" />
           </Link>
+
+          <Link
+            href="/products"
+            className="text-sm font-medium text-zinc-700 transition-colors hover:text-brand-600 relative group"
+          >
+            All Products
+            <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-brand-600 transition-all group-hover:w-full" />
+          </Link>
+
           <Link
             href="/category/women-long-coats"
             className="text-sm font-medium text-zinc-700 transition-colors hover:text-brand-600 relative group"

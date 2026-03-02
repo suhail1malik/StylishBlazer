@@ -10,17 +10,17 @@ async function main() {
   
   // Admin user create/update karo
   const admin = await prisma.admin.upsert({
-    where: { email: 'admin@looklikestitches.com' },
+    where: { email: 'admin@StylishBlazer.com' },
     update: {},
     create: {
-      email: 'admin@looklikestitches.com',
+      email: 'admin@StylishBlazer.com',
       password: hashedPassword,
       name: 'Admin User',
     },
   });
 
   console.log('✅ Admin user created:', admin.email);
-  console.log('📧 Email: admin@looklikestitches.com');
+  console.log('📧 Email: admin@StylishBlazer.com');
   console.log('🔑 Password: admin123');
 }
 

@@ -26,35 +26,15 @@ export async function GET() {
 }
 
 // POST - Create new category (Admin only)
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json();
-    const { name, slug, description, image, isNew } = body;
-
-    // Validation
-    if (!name || !slug) {
-      return NextResponse.json(
-        { error: 'Name and slug are required' },
-        { status: 400 }
-      );
-    }
-
+    const { name, description, order } = await req.json();
+    const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
     const category = await prisma.category.create({
-      data: {
-        name,
-        slug,
-        description,
-        image,
-        isNew: isNew || false,
-      },
+      data: { name, slug, description: description || '', isActive: true, order: order || 0 },
     });
-
     return NextResponse.json(category, { status: 201 });
-  } catch (error) {
-    console.error('Error creating category:', error);
-    return NextResponse.json(
-      { error: 'Failed to create category' },
-      { status: 500 }
-    );
+  } catch {
+    return NextResponse.json({ error: 'Create failed' }, { status: 500 });
   }
 }

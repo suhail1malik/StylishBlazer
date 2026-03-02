@@ -1,117 +1,121 @@
-// prisma/seed.ts
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
+import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
 async function main() {
-  console.log("🌱 Seeding database...");
+  console.log('🌱 Seeding database...')
 
-  // Create Categories
-  const womenCoats = await prisma.category.create({
-    data: {
-      name: "Women Long Coats",
-      slug: "women-long-coats",
-      description: "Elegant woolen long coats for women in custom sizes.",
-      isActive: true,
-      order: 1,
+  const womenCoats = await prisma.category.upsert({
+    where: { slug: 'women-coats' },
+    update: {},
+    create: {
+      name: 'Women Long Coats',
+      slug: 'women-coats',
+      description: 'Premium women long coats collection',
+      image: 'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=500',
     },
-  });
+  })
 
-  const mensBlazers = await prisma.category.create({
-    data: {
-      name: "Mens Blazers",
-      slug: "mens-blazers",
-      description: "Formal and semi-formal mens blazers for office and events.",
-      isActive: true,
-      order: 2,
+  const mensBlazer = await prisma.category.upsert({
+    where: { slug: 'mens-blazers' },
+    update: {},
+    create: {
+      name: 'Mens Blazers',
+      slug: 'mens-blazers',
+      description: 'Premium mens blazers collection',
+      image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=500',
     },
-  });
+  })
 
-  const woolenJackets = await prisma.category.create({
-    data: {
-      name: "Woolen Jackets",
-      slug: "woolen-jackets",
-      description: "Warm woolen jackets suitable for daily winter wear.",
-      isActive: true,
-      order: 3,
+  const woolenJackets = await prisma.category.upsert({
+    where: { slug: 'woolen-jackets' },
+    update: {},
+    create: {
+      name: 'Woolen Jackets',
+      slug: 'woolen-jackets',
+      description: 'Premium woolen jackets collection',
+      image: 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=500',
     },
-  });
+  })
 
-  console.log("✅ Categories created");
+  console.log('✅ Categories ready')
 
-  // Create Products
+  await prisma.product.deleteMany({})
+
   await prisma.product.createMany({
     data: [
       {
-        name: "Women Wool Long Coat - Brown",
-        slug: "women-wool-long-coat-brown",
-        shortDescription: "Tailored wool coat in rich brown with full-length coverage.",
-        description: "Premium women wool long coat manufactured with high-quality fabric.",
-        price: 2499,
-        images: ["/images/products/women-coat-1.jpg"],
-        sizes: ["S", "M", "L", "XL"],
-        categoryId: womenCoats.id,
-        isFeatured: true,
-        isActive: true,
-      },
-      {
-        name: "Women Wool Long Coat - Black",
-        slug: "women-wool-long-coat-black",
-        shortDescription: "Classic black long coat, ideal for corporate and casual wear.",
-        price: 2699,
-        images: ["/images/products/women-coat-2.jpg"],
-        sizes: ["S", "M", "L", "XL"],
-        categoryId: womenCoats.id,
-        isFeatured: true,
-        isActive: true,
-      },
-      {
-        name: "Mens Navy Slim Blazer",
-        slug: "mens-navy-slim-blazer",
-        shortDescription: "Slim-fit navy blazer perfect for office and formal meetings.",
+        name: 'Classic Black Long Coat',
+        slug: 'classic-black-long-coat',
+        shortDescription: 'Premium black long coat for women',
+        description: 'Premium quality black long coat for women. Perfect for winter season.',
         price: 2999,
-        images: ["/images/products/mens-blazer-1.jpg"],
-        sizes: ["38", "40", "42", "44"],
-        categoryId: mensBlazers.id,
+        images: ['https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=500'],
+        sizes: ['S', 'M', 'L', 'XL'],
+        tags: ['coat', 'winter', 'women'],
         isFeatured: true,
         isActive: true,
+        categoryId: womenCoats.id,
       },
       {
-        name: "Mens Grey Check Blazer",
-        slug: "mens-check-blazer-grey",
-        shortDescription: "Grey check pattern blazer with modern cut and sharp lines.",
-        price: 3199,
-        images: ["/images/products/mens-blazer-2.jpg"],
-        sizes: ["38", "40", "42", "44"],
-        categoryId: mensBlazers.id,
+        name: 'Brown Wool Coat',
+        slug: 'brown-wool-coat',
+        shortDescription: 'Elegant brown wool coat for women',
+        description: 'Elegant brown wool coat. Warm and stylish for winters.',
+        price: 3499,
+        images: ['https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=500'],
+        sizes: ['S', 'M', 'L'],
+        tags: ['coat', 'wool', 'women'],
         isFeatured: true,
         isActive: true,
+        categoryId: womenCoats.id,
+      },
+      {
+        name: 'Navy Blue Formal Blazer',
+        slug: 'navy-blue-formal-blazer',
+        shortDescription: 'Professional navy blue blazer for men',
+        description: 'Professional navy blue blazer. Perfect for office and formal events.',
+        price: 2499,
+        images: ['https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=500'],
+        sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+        tags: ['blazer', 'formal', 'men'],
+        isFeatured: true,
+        isActive: true,
+        categoryId: mensBlazer.id,
+      },
+      {
+        name: 'Charcoal Grey Blazer',
+        slug: 'charcoal-grey-blazer',
+        shortDescription: 'Slim fit charcoal grey blazer',
+        description: 'Slim fit charcoal grey blazer. Modern and elegant design.',
+        price: 2799,
+        images: ['https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=500'],
+        sizes: ['M', 'L', 'XL'],
+        tags: ['blazer', 'slim-fit', 'men'],
+        isFeatured: true,
+        isActive: true,
+        categoryId: mensBlazer.id,
+      },
+      {
+        name: 'Camel Woolen Jacket',
+        slug: 'camel-woolen-jacket',
+        shortDescription: 'Premium camel woolen jacket unisex',
+        description: 'Premium camel color woolen jacket. Unisex design for all occasions.',
+        price: 1999,
+        images: ['https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=500'],
+        sizes: ['S', 'M', 'L', 'XL'],
+        tags: ['jacket', 'woolen', 'unisex'],
+        isFeatured: false,
+        isActive: true,
+        categoryId: woolenJackets.id,
       },
     ],
-  });
+  })
 
-  console.log("✅ Products created");
-  // Create default admin user (password: Admin@123)
-  const hashedPassword = await bcrypt.hash("Admin@123", 10);
-
-  await prisma.adminUser.create({
-    data: {
-      email: "admin@looklikestitches.com",
-      password: hashedPassword,
-      name: "Admin",
-    },
-  });
-
-
-  console.log("✅ Admin user created (email: admin@looklikestitches.com, password: Admin@123)");
+  console.log('✅ Products created')
+  console.log('🎉 Seeding complete!')
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .catch((e) => { console.error('❌ Error:', e); process.exit(1) })
+  .finally(async () => { await prisma.$disconnect() })

@@ -17,6 +17,7 @@ export default function AdminNav({ user }: { user?: User }) {
     { href: "/admin", label: "Dashboard", icon: "📊" },
     { href: "/admin/products", label: "Products", icon: "👔" },
     { href: "/admin/categories", label: "Categories", icon: "📁" },
+    { href: "/admin/enquiries", label: "Enquiries", icon: "📩" },
   ];
 
   const handleLogout = async () => {
@@ -44,7 +45,7 @@ export default function AdminNav({ user }: { user?: User }) {
               👔
             </div>
             <div>
-              <div className="font-bold text-slate-900">LookLikeStitches</div>
+              <div className="font-bold text-slate-900">StylishBlazer</div>
               <div className="text-xs text-slate-500">Admin Panel</div>
             </div>
           </Link>
