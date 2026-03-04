@@ -112,3 +112,8 @@ a, button, input, textarea, select {
 .shadow-soft { box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
 .shadow-premium { box-shadow: 0 8px 40px rgba(0,0,0,0.12); }
 .shadow-glow-green { box-shadow: 0 0 30px rgba(22,163,74,0.25); }
+
+
+html, body {
+  overflow-x: hidden;
+}
