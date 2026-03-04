@@ -104,7 +104,7 @@ export function Navbar() {
             aria-label="Call Now"
           >
             <Phone className="h-4 w-4" />
-            <span className="text-[11px] font-bold tracking-tight whitespace-nowrap">7906200663</span>
+            
           </a>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
