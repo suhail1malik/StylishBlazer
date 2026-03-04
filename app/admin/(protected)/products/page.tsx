@@ -56,7 +56,7 @@ export default async function AdminProductsPage() {
       </div>
 
       {/* ── Stats Overview ────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
         {[
           { label: "Total Articles", value: stats.total, icon: <Package />, color: "bg-slate-900 text-white" },
           { label: "Visible in Store", value: stats.active, icon: <Eye />, color: "bg-emerald-50 text-emerald-700 border border-emerald-100" },

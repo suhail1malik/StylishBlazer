@@ -1,6 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import nodemailer from "nodemailer";
+import { z } from "zod";
+import rateLimit from "@/lib/rate-limit";
+
+const limiter = rateLimit({
+  interval: 15 * 60 * 1000, // 15 minutes
+  uniqueTokenPerInterval: 500, // Max 500 IPs
+});
+
+const enquirySchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters").max(100),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(10, "Phone number must be at least 10 digits").max(20),
+  message: z.string().max(2000, "Message is too long").optional(),
+  source: z.string().optional(),
+  productName: z.string().optional().nullable(),
+  productImage: z.string().url().optional().nullable().or(z.literal("")),
+  productUrl: z.string().url().optional().nullable().or(z.literal("")),
+});
 
 // GET - fetch all enquiries (admin)
 export async function GET() {
@@ -16,38 +34,45 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const {
-      name,
-      email,
-      phone,
-      message,
-      source,
-      productName,
-      productImage,
-      productUrl
-    } = body;
-
-    if (!name || !email || !phone) {
+    // 1. Rate Limiting Check (Max 5 req per 15 min per IP)
+    const ip = req.headers.get("x-forwarded-for") || "127.0.0.1";
+    try {
+      await limiter.check(5, ip);
+    } catch {
       return NextResponse.json(
-        { error: "Name, email, and phone are required" },
-        { status: 400 }
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
       );
     }
 
-    // 1. Database mein save karo
+    const body = await req.json();
+
+    // 2. Input Validation via Zod
+    const validationResult = enquirySchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: validationResult.error.issues[0].message },
+        { status: 400 }
+      );
+    }
+    const validatedData = validationResult.data;
+
+    // 3. Database mein save karo
     const enquiry = await prisma.enquiry.create({
       data: {
-        name,
-        email,
-        phone,
-        message: message || "",
-        source: source || "general",
-        productName: productName || null,
-        productImage: productImage || null,
-        productUrl: productUrl || null,
+        name: validatedData.name,
+        email: validatedData.email,
+        phone: validatedData.phone,
+        message: validatedData.message || "",
+        source: validatedData.source || "general",
+        productName: validatedData.productName || null,
+        productImage: validatedData.productImage || null,
+        productUrl: validatedData.productUrl || null,
       },
     });
+
+    // 4. Admin ko notify karo (Email)
+    const { name, email, phone, message, source, productName, productImage, productUrl } = validatedData;
 
     // 2. Admin ko notify karo (Email)
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
