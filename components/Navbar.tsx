@@ -73,6 +73,7 @@ export function Navbar() {
             { name: "Men", href: "/category/mens-blazers" },
             { name: "About", href: "/about" },
             { name: "Contact", href: "/contact" },
+            { name: "Admin", href: "/admin" },
           ].map((item) => (
             <Link
               key={item.name}
@@ -130,6 +131,7 @@ export function Navbar() {
             { name: "Mens Blazers", href: "/category/mens-blazers" },
             { name: "Our Story", href: "/about" },
             { name: "Contact Us", href: "/contact" },
+            { name: "Admin Login", href: "/admin" },
           ].map((item) => (
             <Link
               key={item.name}
