@@ -8,11 +8,11 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/80 backdrop-blur-xl shadow-sm">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:py-4 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/80 backdrop-blur-xl shadow-sm overflow-x-hidden">
+      <nav className="mx-auto flex w-full max-w-7xl min-w-0 items-center justify-between gap-4 px-4 py-3 md:py-4 lg:px-8">
         
         {/* LOGO & BRAND */}
-        <Link href="/" className="flex items-center gap-3 group shrink-0">
+        <Link href="/" className="flex items-center gap-3 group min-w-0">
           <div className="relative h-10 w-10 md:h-12 md:w-12 flex-shrink-0">
             <svg
               viewBox="0 0 48 48"
@@ -104,7 +104,7 @@ export function Navbar() {
             aria-label="Call Now"
           >
             <Phone className="h-4 w-4" />
-            <span className="text-[11px] font-bold tracking-tight">+91 79062</span>
+            <span className="text-[11px] font-bold tracking-tight whitespace-nowrap">7906200663</span>
           </a>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
