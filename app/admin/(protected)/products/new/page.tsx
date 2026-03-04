@@ -1,381 +1,327 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { 
+  ChevronLeft, 
+  Save, 
+  Plus, 
+  Image as ImageIcon, 
+  Info, 
+  Tag, 
+  Settings, 
+  Layers, 
+  UploadCloud,
+  X,
+  CheckCircle2,
+  AlertCircle
+} from "lucide-react";
+
 import ImageUploader from "@/components/admin/ImageUploader";
 
 interface Category {
   id: string;
   name: string;
-  slug: string;
 }
 
-export default function AddProductPage() {
+export default function AdminProductNewPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+
   const [categories, setCategories] = useState<Category[]>([]);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  const [name, setName] = useState("");
-  const [shortDescription, setShortDescription] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [categoryId, setCategoryId] = useState("");
-  const [isFeatured, setIsFeatured] = useState(false);
-  const [isActive, setIsActive] = useState(true);
-  const [images, setImages] = useState<{ url: string; publicId: string }[]>([]);
-  const [sizes, setSizes] = useState<string[]>([]);
-  const [tags, setTags] = useState("");
-
-  const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  
+  const [form, setForm] = useState({
+    name: "",
+    slug: "",
+    shortDescription: "",
+    description: "",
+    price: 0,
+    categoryId: "",
+    images: [] as string[],
+    isActive: true,
+    isFeatured: false,
+    fabric: "",
+    care: "",
+    moq: "",
+    finish: "",
+  });
 
   useEffect(() => {
     fetch("/api/categories")
       .then((res) => res.json())
-      .then((data) => setCategories(data))
-      .catch(() => setError("Categories load nahi huyi"));
+      .then((data) => {
+        setCategories(data);
+        setLoading(false);
+      });
   }, []);
 
-  function generateSlug(name: string) {
-    return name
+  // Simple sluggish generator
+  useEffect(() => {
+    const slug = form.name
       .toLowerCase()
       .trim()
-      .replace(/[^a-z0-9\s-]/g, "")
-      .replace(/\s+/g, "-");
-  }
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    setForm(f => ({ ...f, slug }));
+  }, [form.name]);
 
-  function toggleSize(size: string) {
-    if (sizes.includes(size)) {
-      setSizes(sizes.filter((s) => s !== size));
-    } else {
-      setSizes([...sizes, size]);
-    }
-  }
-  async function handleSubmit(e: React.FormEvent) {
+  const handleImagesChange = (uploadedImages: { url: string; publicId: string }[]) => {
+    setForm(prev => ({ ...prev, images: uploadedImages.map(img => img.url) }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-
-    if (!name || !shortDescription || !price || !categoryId) {
-      setError("Name, Short Description, Price aur Category required hain");
-      return;
-    }
-
-    setLoading(true);
-
+    setSaving(true);
     try {
-      const imageUrls = images.map((img) => img.url);
-      const tagsArray = tags
-        .split(",")
-        .map((t) => t.trim())
-        .filter((t) => t !== "");
-
       const res = await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          slug: generateSlug(name),
-          shortDescription,
-          description,
-          price: parseInt(price),
-          categoryId,
-          isFeatured,
-          isActive,
-          images: imageUrls,
-          sizes,
-          tags: tagsArray,
-        }),
+        body: JSON.stringify(form),
       });
-
-      // ✅ Pehle text read karo
-      const text = await res.text();
-      let data: any = {};
-
-      try {
-        data = JSON.parse(text);
-      } catch {
-        console.error("Server response:", text);
-        setError(`Server error: ${text.slice(0, 150)}`);
-        return;
+      if (res.ok) {
+        router.push("/admin/products");
+        router.refresh();
       }
-
-      if (!res.ok) {
-        setError(data.error || "Product create nahi hua");
-        return;
-      }
-
-      setSuccess("✅ Product successfully add ho gaya!");
-      setTimeout(() => router.push("/admin/products"), 1500);
-    } catch (err: any) {
-      setError("Network error: " + err.message);
+    } catch (err) {
+      console.error(err);
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
-  }
+  };
+
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center py-32 space-y-4">
+      <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+      <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Initializing Studio...</p>
+    </div>
+  );
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link
-          href="/admin/products"
-          className="text-gray-500 hover:text-gray-700 transition-colors text-sm"
-        >
-          ← Back
-        </Link>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Add New Product</h1>
-          <p className="text-gray-500 text-sm mt-0.5">
-            Fill in product details below
-          </p>
+    <div className="max-w-6xl mx-auto pb-24">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div className="space-y-1">
+          <Link 
+            href="/admin/products" 
+            className="group inline-flex items-center gap-2 text-slate-400 hover:text-emerald-600 transition-colors mb-2"
+          >
+            <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+            <span className="text-[10px] uppercase font-bold tracking-widest">Collection Overview</span>
+          </Link>
+          <h1 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+            New Product
+          </h1>
+          <p className="text-slate-500 text-sm font-medium">Add a new masterpiece to your curated collection.</p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            form="product-form"
+            type="submit"
+            disabled={saving}
+            className="flex items-center gap-2 px-8 py-3.5 bg-emerald-950 text-emerald-50 hover:bg-emerald-900 rounded-2xl transition-all font-bold uppercase tracking-widest text-[10px] shadow-xl shadow-emerald-900/10 active:scale-95 disabled:opacity-50"
+          >
+            <Plus className="w-4 h-4" />
+            {saving ? "Creating Art..." : "Publish Article"}
+          </button>
         </div>
       </div>
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-          {error}
-        </div>
-      )}
-      {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
-          {success}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Basic Info */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-5">
-          <h2 className="font-semibold text-gray-900 text-lg border-b pb-3">
-            Basic Information
-          </h2>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Product Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Classic Black Long Coat"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
+      <form id="product-form" onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="lg:col-span-4 space-y-8">
+          <section className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-200/60">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 mb-6 flex items-center gap-2">
+              <ImageIcon className="w-3.5 h-3.5" /> Product Gallery
+            </h3>
+            
+            <ImageUploader 
+              images={(form.images || []).map(url => ({ url, publicId: "" }))} 
+              onChange={handleImagesChange}
+              maxImages={10}
             />
-            {name && (
-              <p className="text-xs text-gray-400 mt-1">
-                Slug: <span className="font-mono">{generateSlug(name)}</span>
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Short Description <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={shortDescription}
-              onChange={(e) => setShortDescription(e.target.value)}
-              placeholder="e.g. Premium black long coat for women"
-              maxLength={150}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-            <p className="text-xs text-gray-400 mt-1">
-              {shortDescription.length}/150
+            
+            <p className="mt-4 text-[10px] text-slate-400 leading-relaxed font-medium text-center">
+              Upload multiple perspectives. The first image will be your main collection visual.
             </p>
-          </div>
+          </section>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Full Description
-            </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Detailed product description..."
-              rows={4}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-            />
-          </div>
+          <section className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-200/60 space-y-6">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 mb-2 flex items-center gap-2">
+              <Settings className="w-3.5 h-3.5" /> Initial State
+            </h3>
+            <div className="space-y-4">
+              <label className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer ${
+                form.isActive ? "bg-emerald-50/50 border-emerald-100" : "bg-slate-50 border-slate-100 hover:border-slate-200"
+              }`}>
+                <div>
+                  <p className="text-xs font-bold text-slate-900">Publish Instantly</p>
+                  <p className="text-[10px] text-slate-400">Makes the article live immediately</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={form.isActive}
+                  onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+                  className="w-5 h-5 rounded-md text-emerald-600 focus:ring-emerald-500 border-slate-200"
+                />
+              </label>
+
+              <label className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer ${
+                form.isFeatured ? "bg-amber-50/50 border-amber-100" : "bg-slate-50 border-slate-100 hover:border-slate-200"
+              }`}>
+                <div>
+                  <p className="text-xs font-bold text-slate-900">Spotlight Feature</p>
+                  <p className="text-[10px] text-slate-400">Highlight in Home Collections</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={form.isFeatured}
+                  onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
+                  className="w-5 h-5 rounded-md text-amber-600 focus:ring-amber-500 border-slate-200"
+                />
+              </label>
+            </div>
+          </section>
         </div>
 
-        {/* Pricing & Category */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-5">
-          <h2 className="font-semibold text-gray-900 text-lg border-b pb-3">
-            Pricing & Category
-          </h2>
+        <div className="lg:col-span-8 space-y-8">
+          <section className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-200/60 space-y-8">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-6 mb-2">
+               <h3 className="text-xl font-serif font-bold text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>Product Narrative</h3>
+               <Layers className="w-5 h-5 text-slate-200" />
+            </div>
 
-          <div className="grid grid-cols-2 gap-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Price (₹) <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
-                  ₹
-                </span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="md:col-span-2 space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-emerald-600">Product Title</label>
                 <input
-                  type="number"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="2999"
-                  min="0"
-                  className="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
+                  type="text"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="w-full bg-slate-50/80 border-none rounded-2xl px-6 py-5 text-lg font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-all"
+                  placeholder="e.g. Italian Silk Dinner Jacket"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400">Auto-Generated Slug</label>
+                <div className="flex items-center gap-2 bg-slate-200/30 rounded-2xl px-5 py-4 border border-slate-100/50">
+                   <input
+                    required
+                    type="text"
+                    value={form.slug}
+                    className="flex-1 bg-transparent border-none p-0 text-sm font-semibold text-slate-400 focus:ring-0 cursor-not-allowed"
+                    readOnly
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400">Curated Category</label>
+                <select
+                  required
+                  value={form.categoryId}
+                  onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+                  className="w-full bg-slate-50/80 border-none rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-all appearance-none"
+                >
+                  <option value="">Select Curated Collection</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="md:col-span-2 space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400">Investment (Price)</label>
+                <div className="relative">
+                   <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 font-serif font-bold text-lg">₹</div>
+                   <input
+                    required
+                    type="number"
+                    value={form.price || ""}
+                    onChange={(e) => setForm({ ...form, price: parseInt(e.target.value) || 0 })}
+                    className="w-full bg-slate-50/80 border-none rounded-2xl pl-12 pr-6 py-5 text-xl font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-all"
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+
+              <div className="md:col-span-2 space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400">Brief Highlights (Short Description)</label>
+                <textarea
+                  required
+                  rows={2}
+                  value={form.shortDescription}
+                  onChange={(e) => setForm({ ...form, shortDescription: e.target.value })}
+                  className="w-full bg-slate-50/80 border-none rounded-2xl px-6 py-4 text-sm text-slate-600 leading-relaxed focus:ring-2 focus:ring-emerald-500 transition-all resize-none"
+                  placeholder="A one-sentence hook for this piece..."
+                />
+              </div>
+
+              <div className="md:col-span-2 space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400">The Narrative (Detailed Description)</label>
+                <textarea
+                  required
+                  rows={6}
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  className="w-full bg-slate-50/80 border-none rounded-3xl px-6 py-5 text-sm text-slate-600 leading-relaxed focus:ring-2 focus:ring-emerald-500 transition-all resize-none"
+                  placeholder="Describe the silhouette, the feel, and the artisan details..."
                 />
               </div>
             </div>
+          </section>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Category <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                required
-              >
-                <option value="">Select category</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+          <section className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-200/60 space-y-8">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-6 mb-2">
+               <h3 className="text-xl font-serif font-bold text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>Technical Blueprint</h3>
+               <Tag className="w-5 h-5 text-slate-200" />
             </div>
-          </div>
-        </div>
 
-        {/* Images */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4">
-          <div className="border-b pb-3">
-            <h2 className="font-semibold text-gray-900 text-lg">
-              Product Images
-            </h2>
-            <p className="text-xs text-gray-500 mt-1">
-              Ek ek karke upload karo • Crop karke set karo • Max 5 images
-            </p>
-          </div>
-          <ImageUploader images={images} onChange={setImages} maxImages={5} />
-        </div>
-
-        {/* Sizes */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4">
-          <h2 className="font-semibold text-gray-900 text-lg border-b pb-3">
-            Available Sizes
-          </h2>
-          <div className="flex flex-wrap gap-3">
-            {availableSizes.map((size) => (
-              <button
-                key={size}
-                type="button"
-                onClick={() => toggleSize(size)}
-                className={`px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all ${
-                  sizes.includes(size)
-                    ? "border-blue-600 bg-blue-600 text-white"
-                    : "border-gray-200 text-gray-600 hover:border-gray-400"
-                }`}
-              >
-                {size}
-              </button>
-            ))}
-          </div>
-          {sizes.length > 0 && (
-            <p className="text-xs text-gray-500">
-              Selected: {sizes.join(", ")}
-            </p>
-          )}
-        </div>
-
-        {/* Tags & Settings */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-5">
-          <h2 className="font-semibold text-gray-900 text-lg border-b pb-3">
-            Tags & Settings
-          </h2>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Tags{" "}
-              <span className="text-gray-400 text-xs">(comma separated)</span>
-            </label>
-            <input
-              type="text"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              placeholder="coat, winter, women, premium"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Featured Toggle */}
-          <div className="flex items-center justify-between py-2">
-            <div>
-              <p className="font-medium text-gray-700">Featured Product</p>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Homepage pe show hoga
-              </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {[
+                { label: "Fabric Blend", key: "fabric", placeholder: "e.g. Grade-A Merino Wool" },
+                { label: "Execution Style", key: "finish", placeholder: "e.g. Hand-stitched Finish" },
+                { label: "Standard MOQ", key: "moq", placeholder: "e.g. Bespoke Single Unit" },
+                { label: "Preservation", key: "care", placeholder: "e.g. Specialized Dry Cleaning" },
+              ].map((spec) => (
+                <div key={spec.key} className="space-y-2">
+                  <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                    <Info className="w-3.5 h-3.5" /> {spec.label}
+                  </label>
+                  <input
+                    type="text"
+                    value={(form as any)[spec.key]}
+                    onChange={(e) => setForm({ ...form, [spec.key]: e.target.value })}
+                    className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-all"
+                    placeholder={spec.placeholder}
+                  />
+                </div>
+              ))}
             </div>
+          </section>
+
+         
+          </div>
+
+          <div className="lg:col-span-12 pt-8">
             <button
-              type="button"
-              onClick={() => setIsFeatured(!isFeatured)}
-              className={`w-12 h-6 rounded-full transition-colors relative shrink-0 ${
-                isFeatured ? "bg-blue-600" : "bg-gray-200"
-              }`}
+              onClick={handleSubmit}
+              disabled={saving}
+              className="w-full bg-emerald-950 text-emerald-400 rounded-[32px] py-6 font-serif text-xl font-bold flex items-center justify-center gap-4 shadow-2xl shadow-emerald-900/40 hover:bg-emerald-900 hover:scale-[1.02] transition-all active:scale-95 disabled:opacity-50 border border-emerald-800/50"
             >
-              <div
-                className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  isFeatured ? "translate-x-7" : "translate-x-1"
-                }`}
-              />
+              {saving ? (
+                <div className="w-6 h-6 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
+              ) : (
+                <>
+                  <Plus className="w-6 h-6" />
+                  Publish to Collection
+                </>
+              )}
             </button>
           </div>
-
-          {/* Active Toggle */}
-          <div className="flex items-center justify-between py-2 border-t">
-            <div>
-              <p className="font-medium text-gray-700">Active / Visible</p>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Store me visible hoga
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsActive(!isActive)}
-              className={`w-12 h-6 rounded-full transition-colors relative shrink-0 ${
-                isActive ? "bg-green-500" : "bg-gray-200"
-              }`}
-            >
-              <div
-                className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  isActive ? "translate-x-7" : "translate-x-1"
-                }`}
-              />
-            </button>
-          </div>
-        </div>
-
-        {/* Submit Button */}
-        <div className="flex gap-4 pb-8">
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
-          >
-            {loading ? "Adding Product..." : "Add Product"}
-          </button>
-          <Link
-            href="/admin/products"
-            className="px-6 py-3 border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors font-medium"
-          >
-            Cancel
-          </Link>
-        </div>
-      </form>
+        </form>
     </div>
   );
 }

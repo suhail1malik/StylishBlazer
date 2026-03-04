@@ -7,14 +7,16 @@ interface EnquiryModalProps {
   isOpen: boolean;
   onClose: () => void;
   productName: string;
-  productSlug?: string;
+  productImage?: string;
+  productUrl?: string;
 }
 
 export default function EnquiryModal({
   isOpen,
   onClose,
   productName,
-  productSlug,
+  productImage,
+  productUrl,
 }: EnquiryModalProps) {
   const [form, setForm] = useState({
     name: "",
@@ -46,7 +48,10 @@ export default function EnquiryModal({
           name: form.name,
           email: form.email,
           phone: form.phone,
-          productInterest: productName,
+          productName: productName,
+          productImage: productImage,
+          productUrl: productUrl,
+          source: "product",
           message: `Quantity: ${form.quantity}\n\n${form.message}`,
         }),
       });
@@ -190,9 +195,8 @@ export default function EnquiryModal({
             )}
 
             <div className="flex gap-3 pt-2">
-              {/* WhatsApp button */}
               <a
-                href={`https://wa.me/911234567890?text=Hi, I'm interested in ${encodeURIComponent(productName)}. Quantity: ${form.quantity || "TBD"}`}
+                href={`https://wa.me/917906200663?text=Hi, I'm interested in ${encodeURIComponent(productName)}. Quantity: ${form.quantity || "TBD"}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 flex items-center justify-center gap-2 bg-[#25D366] text-white py-2.5 rounded-lg text-sm font-medium hover:bg-[#20ba5a] transition-colors"

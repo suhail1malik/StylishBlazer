@@ -134,34 +134,33 @@ export default function ImageUploader({
     <div className="space-y-4">
       {/* Uploaded Images Grid */}
       {images.length > 0 && (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {images.map((img, index) => (
             <div
               key={index}
-              className="relative group aspect-3/4 rounded-xl overflow-hidden border-2 border-gray-200"
+              className="relative group aspect-[3/4] rounded-3xl overflow-hidden border border-slate-200 bg-slate-50 shadow-sm"
             >
               <Image
                 src={img.url}
                 alt={`Product ${index + 1}`}
                 fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 20vw"
-                style={{ objectFit: "cover" }}
+                className="object-cover transition-transform duration-700 group-hover:scale-110"
+                sizes="(max-width: 768px) 50vw, 25vw"
                 priority={index === 0}
               />
-              {/* Delete button */}
-              <button
-                type="button"
-                onClick={() => handleDelete(index)}
-                className="absolute top-1.5 right-1.5 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
-              >
-                ✕
-              </button>
-              {/* Order badge */}
+              <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                 <button
+                  type="button"
+                  onClick={() => handleDelete(index)}
+                  className="bg-red-500/90 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-xl hover:bg-red-600 transition-all active:scale-90"
+                >
+                  <span className="text-xl">✕</span>
+                </button>
+              </div>
               {index === 0 && (
-                <span className="absolute bottom-1.5 left-1.5 bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">
-                  Main
-                </span>
+                <div className="absolute top-3 left-3 bg-emerald-900 text-emerald-400 text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg border border-emerald-800/50 backdrop-blur-md">
+                  Hero Visual
+                </div>
               )}
             </div>
           ))}
@@ -181,15 +180,17 @@ export default function ImageUploader({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="w-full border-2 border-dashed border-gray-300 hover:border-blue-400 hover:bg-blue-50 rounded-xl p-6 flex flex-col items-center gap-2 transition-all"
+            className="w-full border-2 border-dashed border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50 rounded-[32px] p-8 md:p-12 flex flex-col items-center gap-4 transition-all group"
           >
-            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-2xl">
+            <div className="w-16 h-16 bg-slate-100 group-hover:bg-emerald-100 rounded-[24px] flex items-center justify-center text-3xl transition-colors duration-500">
               📷
             </div>
-            <p className="font-medium text-gray-700">Photo Upload karo</p>
-            <p className="text-xs text-gray-400">
-              {images.length}/{maxImages} images • JPG, PNG, WEBP
-            </p>
+            <div className="text-center">
+              <p className="font-serif text-lg font-bold text-slate-900">Upload Perspective</p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
+                {images.length}/{maxImages} High-Res Frames • Visual Storytelling
+              </p>
+            </div>
           </button>
         </div>
       )}

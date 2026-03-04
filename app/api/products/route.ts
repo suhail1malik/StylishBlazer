@@ -1,60 +1,3 @@
-// import { NextRequest, NextResponse } from 'next/server'
-// import { prisma } from '@/lib/prisma'
-// // Removed import for ProductWhereInput as it does not exist in @prisma/client
-
-// // GET - All products (with optional filters)
-// export async function GET(req: NextRequest) {
-//   try {
-//     const { searchParams } = new URL(req.url)
-//     const featured = searchParams.get('featured')
-//     const categorySlug = searchParams.get('category')
-
-//     const where: Record<string, any> = {}
-//     if (featured === 'true') where.featured = true
-//     if (categorySlug) where.category = { slug: categorySlug }
-
-//     const products = await prisma.product.findMany({
-//       where,
-//       include: { category: true },
-//       orderBy: { createdAt: 'desc' },
-//     })
-
-//     return NextResponse.json(products)
-//   } catch {
-//     return NextResponse.json({ error: 'Server error' }, { status: 500 })
-//   }
-// }
-
-// // POST - Create new product
-// export async function POST(req: NextRequest) {
-//   try {
-//     const body = await req.json()
-
-//     const product = await prisma.product.create({
-//       data: {
-//         name: body.name,
-//         description: body.description,
-//         price: parseFloat(body.price),
-//         originalPrice: body.originalPrice ? parseFloat(body.originalPrice) : null,
-//         stock: parseInt(body.stock) || 0,
-//         featured: body.featured || false,
-//         images: body.images || [],
-//         categoryId: body.categoryId,
-//         slug: body.name
-//           .toLowerCase()
-//           .replace(/[^a-z0-9]+/g, '-')
-//           .replace(/(^-|-$)/g, ''),
-//       },
-//     })
-
-//     return NextResponse.json(product, { status: 201 })
-//   } catch (error) {
-//     console.error(error)
-//     return NextResponse.json({ error: 'Create failed' }, { status: 500 })
-//   }
-// }
-
-
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
@@ -63,7 +6,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const featured = searchParams.get('featured')
     const categorySlug = searchParams.get('category')
-    const slugParam = searchParams.get('slug')      
+    const slugParam = searchParams.get('slug')
 
     const where: any = {}
     if (featured === 'true') where.isFeatured = true
@@ -112,6 +55,10 @@ export async function POST(req: NextRequest) {
         isFeatured: body.isFeatured || false,
         isActive: body.isActive !== undefined ? body.isActive : true,
         categoryId: body.categoryId,
+        fabric: body.fabric || '',
+        moq: body.moq || '',
+        care: body.care || '',
+        finish: body.finish || '',
       },
     })
 

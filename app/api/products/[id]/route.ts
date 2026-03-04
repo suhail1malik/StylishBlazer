@@ -42,6 +42,10 @@ export async function PATCH(
         isFeatured: body.isFeatured,
         isActive: body.isActive,
         categoryId: body.categoryId,
+        fabric: body.fabric,
+        moq: body.moq,
+        care: body.care,
+        finish: body.finish,
       },
       include: { category: true },
     });

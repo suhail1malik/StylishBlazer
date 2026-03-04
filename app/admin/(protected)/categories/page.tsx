@@ -1,23 +1,44 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { 
+  Plus, 
+  Pencil, 
+  Trash2, 
+  Image as ImageIcon, 
+  X, 
+  Check, 
+  Pause,
+  ArrowUpDown,
+  Layers,
+  ShoppingBag,
+  ExternalLink
+} from "lucide-react";
 
 interface Category {
   id: string;
   name: string;
   slug: string;
   description: string;
+  image: string | null;
   isActive: boolean;
   order: number;
   _count: { products: number };
 }
+
+type FormState = { name: string; description: string; order: number; image: string };
+
+const EMPTY_FORM: FormState = { name: "", description: "", order: 0, image: "" };
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", description: "", order: 0 });
+  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const fetchCategories = async () => {
     const res = await fetch("/api/categories");
@@ -26,536 +47,389 @@ export default function AdminCategoriesPage() {
     setLoading(false);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await fetchCategories();
-    };
-    fetchData();
-  }, []);
+  useEffect(() => { fetchCategories(); }, []);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadError("");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (data.url) {
+        setForm((f) => ({ ...f, image: data.url }));
+      } else {
+        setUploadError(data.error || "Upload failed");
+      }
+    } catch {
+      setUploadError("Upload failed. Try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
+    const payload = {
+      name: form.name,
+      description: form.description,
+      order: form.order,
+      image: form.image || null,
+    };
     if (editingId) {
       await fetch(`/api/categories/${editingId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
     } else {
       await fetch("/api/categories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
     }
+    setSaving(false);
     setShowForm(false);
     setEditingId(null);
-    setForm({ name: "", description: "", order: 0 });
+    setForm(EMPTY_FORM);
     fetchCategories();
   };
 
   const handleEdit = (cat: Category) => {
-    setForm({ name: cat.name, description: cat.description, order: cat.order });
+    setForm({ name: cat.name, description: cat.description, order: cat.order, image: cat.image ?? "" });
     setEditingId(cat.id);
     setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id: string, productCount: number) => {
-    if (productCount > 0)
-      return alert("Pehle is category ke sare products delete karo!");
-    if (!confirm("Are you sure? Yeh category delete ho jayegi.")) return;
+    if (productCount > 0) return alert("Delete all products in this category first!");
+    if (!confirm("Are you sure you want to delete this category?")) return;
     await fetch(`/api/categories/${id}`, { method: "DELETE" });
     fetchCategories();
   };
 
+  const openAddForm = () => {
+    setShowForm(true);
+    setEditingId(null);
+    setForm(EMPTY_FORM);
+    setUploadError("");
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#f3f4f6",
-        padding: "2rem",
-      }}
-    >
-      {/* ===== PAGE TITLE + ADD BUTTON ===== */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "1.5rem",
-        }}
-      >
+    <div className="space-y-8 pb-12">
+      {/* ── Header ─────────────────────────────────────────────────────── */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 style={{ fontSize: "1.875rem", fontWeight: 700, margin: 0 }}>
+          <h1 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
             Categories
           </h1>
-          <p
-            style={{
-              color: "#6b7280",
-              margin: "0.25rem 0 0",
-              fontSize: "0.875rem",
-            }}
-          >
-            Total {categories.length} categories
+          <p className="text-slate-500 mt-2 text-sm font-medium">
+            Manage your product catalog structure and presentation.
           </p>
         </div>
-        <button
-          onClick={() => {
-            setShowForm(true);
-            setEditingId(null);
-            setForm({ name: "", description: "", order: 0 });
-          }}
-          style={{
-            backgroundColor: "#2563eb",
-            color: "white",
-            padding: "0.625rem 1.25rem",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontWeight: 600,
-            fontSize: "0.875rem",
-          }}
-        >
-          + Add Category
-        </button>
-      </div>
-
-      {/* ===== ADD / EDIT FORM ===== */}
-      {showForm && (
-        <div
-          style={{
-            background: "white",
-            borderRadius: "12px",
-            padding: "1.5rem",
-            marginBottom: "1.5rem",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
-            border: "1px solid #e5e7eb",
-          }}
-        >
-          <h2
-            style={{
-              margin: "0 0 1.25rem",
-              fontSize: "1.125rem",
-              fontWeight: 600,
-            }}
+        {!showForm && (
+          <button
+            onClick={openAddForm}
+            className="group inline-flex items-center gap-2 bg-emerald-950 text-emerald-50 px-6 py-3 rounded-2xl font-bold uppercase tracking-widest text-[10px] hover:bg-emerald-900 transition-all shadow-xl shadow-emerald-900/10 active:scale-95"
           >
-            {editingId ? "✏️ Edit Category" : "➕ Add New Category"}
-          </h2>
-          <form
-            onSubmit={handleSubmit}
-            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-          >
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.375rem",
-                  fontWeight: 500,
-                  fontSize: "0.875rem",
-                  color: "#374151",
-                }}
-              >
-                Category Name <span style={{ color: "red" }}>*</span>
-              </label>
-              <input
-                required
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="e.g. Women Long Coats"
-                style={{
-                  width: "100%",
-                  padding: "0.625rem 0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "8px",
-                  fontSize: "0.875rem",
-                  boxSizing: "border-box",
-                  outline: "none",
-                }}
-              />
-            </div>
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.375rem",
-                  fontWeight: 500,
-                  fontSize: "0.875rem",
-                  color: "#374151",
-                }}
-              >
-                Description
-              </label>
-              <textarea
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
-                placeholder="Category description..."
-                rows={3}
-                style={{
-                  width: "100%",
-                  padding: "0.625rem 0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "8px",
-                  fontSize: "0.875rem",
-                  boxSizing: "border-box",
-                  resize: "vertical",
-                  outline: "none",
-                }}
-              />
-            </div>
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.375rem",
-                  fontWeight: 500,
-                  fontSize: "0.875rem",
-                  color: "#374151",
-                }}
-              >
-                Display Order
-              </label>
-              <input
-                type="number"
-                value={form.order}
-                onChange={(e) =>
-                  setForm({ ...form, order: parseInt(e.target.value) || 0 })
-                }
-                style={{
-                  width: "150px",
-                  padding: "0.625rem 0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "8px",
-                  fontSize: "0.875rem",
-                  outline: "none",
-                }}
-              />
-              <p
-                style={{
-                  margin: "0.25rem 0 0",
-                  fontSize: "0.75rem",
-                  color: "#6b7280",
-                }}
-              >
-                Chhota number pehle dikhega (0 = sabse pehle)
-              </p>
-            </div>
-            <div
-              style={{ display: "flex", gap: "0.75rem", paddingTop: "0.5rem" }}
-            >
-              <button
-                type="submit"
-                style={{
-                  backgroundColor: "#166534",
-                  color: "white",
-                  padding: "0.625rem 1.5rem",
-                  border: "none",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: 600,
-                  fontSize: "0.875rem",
-                }}
-              >
-                {editingId ? "✅ Update Category" : "✅ Create Category"}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowForm(false);
-                  setEditingId(null);
-                  setForm({ name: "", description: "", order: 0 });
-                }}
-                style={{
-                  backgroundColor: "#f9fafb",
-                  color: "#374151",
-                  padding: "0.625rem 1.5rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: 600,
-                  fontSize: "0.875rem",
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* ===== CATEGORIES TABLE ===== */}
-      <div
-        style={{
-          background: "white",
-          borderRadius: "12px",
-          boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
-          overflow: "hidden",
-        }}
-      >
-        {loading ? (
-          <div
-            style={{ padding: "3rem", textAlign: "center", color: "#6b7280" }}
-          >
-            <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>⏳</div>
-            Loading categories...
-          </div>
-        ) : categories.length === 0 ? (
-          <div
-            style={{ padding: "3rem", textAlign: "center", color: "#6b7280" }}
-          >
-            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>📂</div>
-            <p
-              style={{
-                fontWeight: 600,
-                fontSize: "1.125rem",
-                margin: "0 0 0.5rem",
-              }}
-            >
-              Koi category nahi mili
-            </p>
-            <p style={{ margin: 0 }}>
-              Upar "Add Category" button se naya banao
-            </p>
-          </div>
-        ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead style={{ backgroundColor: "#f9fafb" }}>
-              <tr>
-                {[
-                  "Category Name",
-                  "Slug",
-                  "Products",
-                  "Order",
-                  "Status",
-                  "Actions",
-                ].map((h) => (
-                  <th
-                    key={h}
-                    style={{
-                      padding: "0.75rem 1rem",
-                      textAlign: "left",
-                      fontSize: "0.75rem",
-                      fontWeight: 600,
-                      color: "#6b7280",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      borderBottom: "1px solid #e5e7eb",
-                    }}
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {categories.map((cat, i) => (
-                <tr
-                  key={cat.id}
-                  style={{
-                    borderTop: "1px solid #f3f4f6",
-                    backgroundColor: i % 2 === 0 ? "white" : "#fafafa",
-                  }}
-                >
-                  {/* Category Name + Description */}
-                  <td style={{ padding: "1rem" }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                      }}
-                    >
-                      <span style={{ fontSize: "1.25rem" }}>📁</span>
-                      <div>
-                        <div
-                          style={{
-                            fontWeight: 600,
-                            fontSize: "0.875rem",
-                            color: "#111827",
-                          }}
-                        >
-                          {cat.name}
-                        </div>
-                        {cat.description && (
-                          <div
-                            style={{
-                              fontSize: "0.75rem",
-                              color: "#6b7280",
-                              marginTop: "0.125rem",
-                              maxWidth: "250px",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {cat.description}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-
-                  {/* Slug */}
-                  <td style={{ padding: "1rem" }}>
-                    <code
-                      style={{
-                        fontSize: "0.75rem",
-                        backgroundColor: "#f3f4f6",
-                        padding: "0.25rem 0.5rem",
-                        borderRadius: "4px",
-                        color: "#374151",
-                        fontFamily: "monospace",
-                      }}
-                    >
-                      {cat.slug}
-                    </code>
-                  </td>
-
-                  {/* Product Count */}
-                  <td style={{ padding: "1rem" }}>
-                    <span
-                      style={{
-                        backgroundColor:
-                          cat._count.products > 0 ? "#dcfce7" : "#fee2e2",
-                        color: cat._count.products > 0 ? "#166534" : "#991b1b",
-                        padding: "0.25rem 0.75rem",
-                        borderRadius: "9999px",
-                        fontSize: "0.75rem",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {cat._count.products} products
-                    </span>
-                  </td>
-
-                  {/* Order */}
-                  <td style={{ padding: "1rem" }}>
-                    <span
-                      style={{
-                        fontSize: "0.875rem",
-                        color: "#374151",
-                        fontWeight: 500,
-                      }}
-                    >
-                      #{cat.order}
-                    </span>
-                  </td>
-
-                  {/* Status */}
-                  <td style={{ padding: "1rem" }}>
-                    <span
-                      style={{
-                        backgroundColor: cat.isActive ? "#dcfce7" : "#f3f4f6",
-                        color: cat.isActive ? "#166534" : "#6b7280",
-                        padding: "0.25rem 0.75rem",
-                        borderRadius: "9999px",
-                        fontSize: "0.75rem",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {cat.isActive ? "✅ Active" : "⏸ Inactive"}
-                    </span>
-                  </td>
-
-                  {/* Actions */}
-                  <td style={{ padding: "1rem" }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        alignItems: "center",
-                      }}
-                    >
-                      <button
-                        onClick={() => handleEdit(cat)}
-                        style={{
-                          backgroundColor: "#eff6ff",
-                          color: "#2563eb",
-                          border: "1px solid #bfdbfe",
-                          padding: "0.375rem 0.875rem",
-                          borderRadius: "6px",
-                          cursor: "pointer",
-                          fontSize: "0.8rem",
-                          fontWeight: 600,
-                        }}
-                      >
-                        ✏️ Edit
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleDelete(cat.id, cat._count.products)
-                        }
-                        style={{
-                          backgroundColor:
-                            cat._count.products > 0 ? "#f9fafb" : "#fef2f2",
-                          color:
-                            cat._count.products > 0 ? "#9ca3af" : "#dc2626",
-                          border: `1px solid ${cat._count.products > 0 ? "#e5e7eb" : "#fecaca"}`,
-                          padding: "0.375rem 0.875rem",
-                          borderRadius: "6px",
-                          cursor:
-                            cat._count.products > 0 ? "not-allowed" : "pointer",
-                          fontSize: "0.8rem",
-                          fontWeight: 600,
-                          opacity: cat._count.products > 0 ? 0.6 : 1,
-                        }}
-                        title={
-                          cat._count.products > 0
-                            ? "Pehle sare products hatao"
-                            : "Delete category"
-                        }
-                      >
-                        🗑️ Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            <Plus className="w-4 h-4" />
+            New Category
+          </button>
         )}
       </div>
 
-      {/* ===== FOOTER INFO ===== */}
-      <div
-        style={{
-          marginTop: "1.5rem",
-          padding: "1rem 1.5rem",
-          background: "white",
-          borderRadius: "12px",
-          boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            gap: "2rem",
-            fontSize: "0.8rem",
-            color: "#6b7280",
-          }}
-        >
-          <span>
-            📊 Total categories:{" "}
-            <strong style={{ color: "#111827" }}>{categories.length}</strong>
-          </span>
-          <span>
-            ✅ Active:{" "}
-            <strong style={{ color: "#166534" }}>
-              {categories.filter((c) => c.isActive).length}
-            </strong>
-          </span>
-          <span>
-            🛍️ Total products:{" "}
-            <strong style={{ color: "#111827" }}>
-              {categories.reduce((sum, c) => sum + c._count.products, 0)}
-            </strong>
-          </span>
-          <span style={{ marginLeft: "auto", color: "#9ca3af" }}>
-            💡 Tip: Sirf empty categories (0 products) delete ho sakti hain
-          </span>
+      {/* ── Add / Edit Form ────────────────────────────────────────────── */}
+      {showForm && (
+        <div className="bg-white rounded-[32px] shadow-premium border border-slate-200/60 overflow-hidden transition-all animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="p-8 md:p-10">
+            <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-100">
+              <h2 className="text-xl font-serif font-bold text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>
+                {editingId ? "Edit Category" : "Add New Category"}
+              </h2>
+              <button 
+                onClick={() => { setShowForm(false); setEditingId(null); setForm(EMPTY_FORM); }}
+                className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+              {/* Left Column: Image Upload */}
+              <div className="lg:col-span-4 space-y-4">
+                <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-600 mb-2">
+                  Category Aesthetic
+                </label>
+                
+                <div 
+                  className={`relative aspect-[4/5] rounded-[24px] overflow-hidden border-2 border-dashed transition-all duration-300 ${
+                    form.image ? "border-slate-200" : "border-slate-300 hover:border-emerald-400 bg-slate-50/50"
+                  }`}
+                >
+                  {form.image ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={form.image}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-slate-900/20 group hover:bg-slate-900/40 transition-colors flex items-center justify-center">
+                        <button
+                          type="button"
+                          onClick={() => setForm((f) => ({ ...f, image: "" }))}
+                          className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center opacity-0 group-hover:opacity-100 hover:scale-110 transition-all"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer p-6 text-center group">
+                      <div className="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <ImageIcon className="w-8 h-8" />
+                      </div>
+                      <span className="text-sm font-bold text-slate-900 mb-1">Upload Visual</span>
+                      <span className="text-xs text-slate-400 leading-relaxed">Recommended: Portrait orientation for best card display</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageUpload}
+                        disabled={uploading}
+                      />
+                    </label>
+                  )}
+                  {uploading && (
+                    <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center">
+                      <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
+                </div>
+                {uploadError && <p className="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-wider">{uploadError}</p>}
+                
+                <div className="space-y-4 pt-4">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">
+                       Manual URL (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={form.image}
+                      onChange={(e) => setForm({ ...form, image: e.target.value })}
+                      placeholder="https://..."
+                      className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-xs focus:ring-2 focus:ring-emerald-500 transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Info */}
+              <div className="lg:col-span-8 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-600 mb-2">
+                      Category Name
+                    </label>
+                    <input
+                      required
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      placeholder="e.g. Artisanal Blazers"
+                      className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-base font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-all"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">
+                      Collection Narrative
+                    </label>
+                    <textarea
+                      value={form.description}
+                      onChange={(e) => setForm({ ...form, description: e.target.value })}
+                      placeholder="Describe the essence of this category..."
+                      rows={4}
+                      className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm text-slate-600 focus:ring-2 focus:ring-emerald-500 transition-all resize-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">
+                      Display Hierarchy
+                    </label>
+                    <div className="relative">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                        <ArrowUpDown className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="number"
+                        value={form.order}
+                        onChange={(e) => setForm({ ...form, order: parseInt(e.target.value) || 0 })}
+                        className="w-full bg-slate-50 border-none rounded-2xl pl-12 pr-5 py-4 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-all"
+                      />
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-2 font-medium">Lower numbers appear first on the storefront.</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 pt-8 border-t border-slate-100">
+                  <button
+                    type="submit"
+                    disabled={saving || uploading}
+                    className="flex-1 bg-emerald-900 text-white px-8 py-4 rounded-2xl font-bold uppercase tracking-widest text-[10px] hover:bg-emerald-800 transition-all shadow-xl shadow-emerald-900/10 active:scale-95 disabled:opacity-50"
+                  >
+                    {saving ? "Processing..." : editingId ? "Confirm Updates" : "Create Collection"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowForm(false); setEditingId(null); setForm(EMPTY_FORM); }}
+                    className="px-8 py-4 bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded-2xl font-bold uppercase tracking-widest text-[10px] transition-all"
+                  >
+                    Discard
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
+      )}
+
+      {/* ── Grid of Categories ────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {loading ? (
+          [1,2,3].map(n => (
+            <div key={n} className="bg-white rounded-[32px] p-6 h-[200px] animate-pulse border border-slate-100">
+              <div className="w-12 h-12 bg-slate-50 rounded-2xl mb-4" />
+              <div className="h-4 w-32 bg-slate-50 rounded mb-2" />
+              <div className="h-3 w-48 bg-slate-50 rounded" />
+            </div>
+          ))
+        ) : categories.length === 0 ? (
+          <div className="col-span-full py-24 text-center bg-white rounded-[32px] border border-dashed border-slate-200">
+             <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-[32px] flex items-center justify-center mx-auto mb-6">
+               <Layers className="w-10 h-10" />
+             </div>
+             <h3 className="text-xl font-serif font-bold text-slate-900 mb-2">No Categories Defined</h3>
+             <p className="text-slate-400 text-sm max-w-xs mx-auto mb-8 leading-relaxed">
+               Your store currently has no collections. Start by adding your first category.
+             </p>
+             <button onClick={openAddForm} className="text-emerald-600 font-bold uppercase tracking-widest text-[10px] hover:underline">
+               Start Curating +
+             </button>
+          </div>
+        ) : (
+          categories.map((cat) => (
+            <div 
+              key={cat.id} 
+              className="group bg-white rounded-[32px] overflow-hidden border border-slate-200/60 shadow-sm hover:shadow-premium transition-all duration-500"
+            >
+              <div className="aspect-[16/10] relative overflow-hidden bg-slate-100">
+                {cat.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={cat.image} alt={cat.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-slate-300">
+                    <Layers className="w-12 h-12 stroke-[1.5]" />
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                <div className="absolute top-4 right-4 flex items-center gap-2">
+                   <span className={`px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-widest backdrop-blur-md border ${
+                     cat.isActive 
+                       ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600" 
+                       : "bg-slate-500/10 border-slate-500/20 text-slate-500"
+                   }`}>
+                     {cat.isActive ? "Active" : "Hidden"}
+                   </span>
+                </div>
+              </div>
+
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-2">
+                   <div>
+                     <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 mb-1 block">
+                       #{cat.order} In Hierarchy
+                     </span>
+                     <h3 className="text-lg font-serif font-bold text-slate-900 leading-tight tracking-tight">
+                       {cat.name}
+                     </h3>
+                   </div>
+                   <div className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center shrink-0">
+                      <span className="text-[10px] font-bold text-slate-900 leading-none">{cat._count.products}</span>
+                      <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400 leading-none mt-1">Items</span>
+                   </div>
+                </div>
+
+                <p className="text-sm text-slate-500 line-clamp-2 mb-6 min-h-[40px] leading-relaxed">
+                  {cat.description || "No narrative provided for this collection."}
+                </p>
+
+                <div className="flex items-center gap-2 pt-6 border-t border-slate-100 mt-auto">
+                  <button
+                    onClick={() => handleEdit(cat)}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-50 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition-all font-bold text-[10px] uppercase tracking-widest"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(cat.id, cat._count.products)}
+                    disabled={cat._count.products > 0}
+                    className={`p-3 rounded-xl transition-all ${
+                      cat._count.products > 0 
+                        ? "bg-slate-50 text-slate-300 cursor-not-allowed" 
+                        : "bg-red-50 text-red-600 hover:bg-red-100"
+                    }`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <Link 
+                    href={`/category/${cat.slug}`}
+                    target="_blank"
+                    className="p-3 rounded-xl bg-slate-50 text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
+
+      {/* ── Stat Footer ───────────────────────────────────────────────── */}
+      {!loading && (
+        <div className="bg-emerald-950 rounded-[32px] p-8 md:p-12 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
+          <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-8">
+            <div>
+              <p className="text-emerald-400 text-[10px] font-bold uppercase tracking-widest mb-1">Total Collections</p>
+              <p className="text-white text-3xl font-serif font-bold">{categories.length}</p>
+            </div>
+            <div>
+              <p className="text-emerald-400 text-[10px] font-bold uppercase tracking-widest mb-1">Active Status</p>
+              <p className="text-white text-3xl font-serif font-bold">{categories.filter(c => c.isActive).length}</p>
+            </div>
+            <div>
+               <p className="text-emerald-400 text-[10px] font-bold uppercase tracking-widest mb-1">Total Articles</p>
+               <p className="text-white text-3xl font-serif font-bold">{categories.reduce((s, c) => s + c._count.products, 0)}</p>
+            </div>
+            <div className="flex items-center justify-end">
+               <div className="hidden lg:block">
+                 <ShoppingBag className="w-12 h-12 text-emerald-800" />
+               </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

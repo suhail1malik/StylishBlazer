@@ -1,408 +1,402 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { 
+  ChevronLeft, 
+  Save, 
+  Trash2, 
+  Image as ImageIcon, 
+  Plus, 
+  Info, 
+  Tag, 
+  Settings, 
+  Layers, 
+  ExternalLink,
+  UploadCloud,
+  X,
+  CheckCircle2,
+  AlertCircle,
+  ShoppingBag
+} from "lucide-react";
+
 import ImageUploader from "@/components/admin/ImageUploader";
 
 interface Category {
   id: string;
   name: string;
-  slug: string;
 }
 
-interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  shortDescription: string;
-  description: string;
-  price: number;
-  images: string[];
-  sizes: string[];
-  tags: string[];
-  isFeatured: boolean;
-  isActive: boolean;
-  categoryId: string;
-}
-
-export default function EditProductPage() {
+export default function AdminProductEditPage() {
   const params = useParams();
   const router = useRouter();
-  const id = params?.id as string;
+  const id = params.id as string;
 
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  
   const [form, setForm] = useState({
     name: "",
     slug: "",
     shortDescription: "",
     description: "",
-    price: "",
+    price: 0,
     categoryId: "",
-    isFeatured: false,
+    images: [] as string[],
     isActive: true,
-    images: [] as { url: string; publicId: string; file?: File }[], // ✅ array with publicId
-    sizes: "", // ✅ string (comma separated)
-    tags: "", // ✅ string (comma separated)
+    isFeatured: false,
+    fabric: "",
+    care: "",
+    moq: "",
+    finish: "",
   });
 
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
   useEffect(() => {
-    fetch("/api/categories")
-      .then((r) => r.json())
-      .then((data) => setCategories(Array.isArray(data) ? data : []));
-
-    fetch(`/api/products/${id}`)
-      .then((r) => r.json())
-      .then((product: Product) => {
-        if (product && product.id) {
+    const fetchData = async () => {
+      try {
+        const [pRes, cRes] = await Promise.all([
+          fetch(`/api/products/${id}`),
+          fetch("/api/categories"),
+        ]);
+        const product = await pRes.json();
+        const cats = await cRes.json();
+        
+        setCategories(cats);
+        if (product) {
           setForm({
             name: product.name || "",
             slug: product.slug || "",
             shortDescription: product.shortDescription || "",
             description: product.description || "",
-            price: product.price?.toString() || "",
+            price: product.price || 0,
             categoryId: product.categoryId || "",
-            isFeatured: product.isFeatured || false,
-            isActive: product.isActive !== undefined ? product.isActive : true,
-            images: Array.isArray(product.images)
-              ? product.images.map((img: any) =>
-                  typeof img === "string"
-                    ? { url: img, publicId: img }
-                    : { url: img.url, publicId: img.publicId || img.url },
-                )
-              : [], // ✅ FIX
-            sizes: product.sizes?.join(", ") || "", // ✅ string
-            tags: product.tags?.join(", ") || "", // ✅ string
+            images: product.images || [],
+            isActive: product.isActive ?? true,
+            isFeatured: product.isFeatured ?? false,
+            fabric: product.fabric || "",
+            care: product.care || "",
+            moq: product.moq || "",
+            finish: product.finish || "",
           });
         }
+      } catch (err) {
+        console.error("Fetch error:", err);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    };
+    fetchData();
   }, [id]);
+
+  const handleImagesChange = (uploadedImages: { url: string; publicId: string }[]) => {
+    setForm(prev => ({ ...prev, images: uploadedImages.map(img => img.url) }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setError("");
-    setSuccess("");
-
-    const payload = {
-      name: form.name,
-      slug: form.slug,
-      shortDescription: form.shortDescription,
-      description: form.description,
-      price: parseInt(form.price),
-      categoryId: form.categoryId,
-      isFeatured: form.isFeatured,
-      isActive: form.isActive,
-      images: form.images.map((img) => img.url), // ✅ already array
-      sizes: form.sizes
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
-      tags: form.tags
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
-    };
-
     try {
       const res = await fetch(`/api/products/${id}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(form),
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Update failed");
-      } else {
-        setSuccess("Product updated successfully!");
-        setTimeout(() => router.push("/admin/products"), 1500);
+      if (res.ok) {
+        router.push("/admin/products");
+        router.refresh();
       }
-    } catch {
-      setError("Something went wrong");
+    } catch (err) {
+      console.error(err);
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-10 h-10 border-4 border-brand-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-zinc-500 text-sm">Loading product...</p>
-        </div>
-      </div>
-    );
-  }
+  const handleDelete = async () => {
+    if (!confirm("Are you sure? This article will be permanently removed.")) return;
+    try {
+      await fetch(`/api/products/${id}`, { method: "DELETE" });
+      router.push("/admin/products");
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center py-32 space-y-4">
+      <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+      <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Retrieving Article Data...</p>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-zinc-900">Edit Product</h1>
-            <p className="text-sm text-zinc-500 mt-1">Update product details</p>
-          </div>
-          <Link
-            href="/admin/products"
-            className="text-sm text-zinc-500 hover:text-zinc-700 border border-zinc-200 px-4 py-2 rounded-lg bg-white"
+    <div className="max-w-6xl mx-auto pb-24">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div className="space-y-1">
+          <Link 
+            href="/admin/products" 
+            className="group inline-flex items-center gap-2 text-slate-400 hover:text-emerald-600 transition-colors mb-2"
           >
-            ← Back
+            <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+            <span className="text-[10px] uppercase font-bold tracking-widest">Back to Collection</span>
           </Link>
+          <h1 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+            Edit Product
+          </h1>
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+            <span className="text-emerald-600">ID: {id}</span>
+            <span>•</span>
+            <span className={form.isActive ? "text-emerald-500" : "text-red-400"}>
+              {form.isActive ? "Live in Store" : "Hidden"}
+            </span>
+          </div>
         </div>
 
-        {/* Alerts */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
-            ❌ {error}
-          </div>
-        )}
-        {success && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm">
-            ✅ {success}
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleDelete}
+            className="flex items-center gap-2 px-6 py-3.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-2xl transition-all font-bold uppercase tracking-widest text-[10px]"
+          >
+            <Trash2 className="w-4 h-4" />
+            Delete
+          </button>
+          <button
+            form="product-form"
+            type="submit"
+            disabled={saving}
+            className="flex items-center gap-2 px-8 py-3.5 bg-emerald-950 text-emerald-50 hover:bg-emerald-900 rounded-2xl transition-all font-bold uppercase tracking-widest text-[10px] shadow-xl shadow-emerald-900/10 active:scale-95 disabled:opacity-50"
+          >
+            <Save className="w-4 h-4" />
+            {saving ? "Saving Changes..." : "Secure Update"}
+          </button>
+        </div>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Basic Info */}
-          <div className="bg-white rounded-2xl border border-zinc-200 p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-900 mb-5">
-              Basic Information
-            </h2>
+      <form id="product-form" onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="lg:col-span-4 space-y-8">
+          <section className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-200/60">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 mb-6 flex items-center gap-2">
+              <ImageIcon className="w-3.5 h-3.5" /> Product Gallery
+            </h3>
+            
+            <ImageUploader 
+              images={form.images.map(url => ({ url, publicId: "" }))} 
+              onChange={handleImagesChange}
+              maxImages={10}
+            />
+            
+            <p className="mt-4 text-[10px] text-slate-400 leading-relaxed font-medium text-center">
+              The first image will be the primary visual for catalog and search results.
+            </p>
+          </section>
+
+          <section className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-200/60 space-y-6">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 mb-2 flex items-center gap-2">
+              <Settings className="w-3.5 h-3.5" /> Availability
+            </h3>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-1.5">
-                  Product Name <span className="text-red-500">*</span>
-                </label>
+              <label className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer ${
+                form.isActive ? "bg-emerald-50/50 border-emerald-100" : "bg-slate-50 border-slate-100 hover:border-slate-200"
+              }`}>
+                <div>
+                  <p className="text-xs font-bold text-slate-900">Visibility Status</p>
+                  <p className="text-[10px] text-slate-400">{form.isActive ? "Publicly Accessible" : "Hidden from Catalog"}</p>
+                </div>
                 <input
-                  type="text"
+                  type="checkbox"
+                  checked={form.isActive}
+                  onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+                  className="w-5 h-5 rounded-md text-emerald-600 focus:ring-emerald-500 border-slate-200"
+                />
+              </label>
+
+              <label className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer ${
+                form.isFeatured ? "bg-amber-50/50 border-amber-100" : "bg-slate-50 border-slate-100 hover:border-slate-200"
+              }`}>
+                <div>
+                  <p className="text-xs font-bold text-slate-900">Collection Spotlight</p>
+                  <p className="text-[10px] text-slate-400">Featured in Hero Sections</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={form.isFeatured}
+                  onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
+                  className="w-5 h-5 rounded-md text-amber-600 focus:ring-amber-500 border-slate-200"
+                />
+              </label>
+            </div>
+          </section>
+        </div>
+
+        <div className="lg:col-span-8 space-y-8">
+          <section className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-200/60 space-y-8">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-6 mb-2">
+               <h3 className="text-xl font-serif font-bold text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>Narrative & Identification</h3>
+               <Layers className="w-5 h-5 text-slate-200" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="md:col-span-2 space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-emerald-600">Article Title</label>
+                <input
                   required
+                  type="text"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full border border-zinc-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  placeholder="e.g. Navy Blue Formal Blazer"
+                  className="w-full bg-slate-50/80 border-none rounded-2xl px-6 py-5 text-lg font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-all"
+                  placeholder="e.g. Royal Oxford bespoke Blazer"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-1.5">
-                  Slug <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={form.slug}
-                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                  className="w-full border border-zinc-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  placeholder="navy-blue-formal-blazer"
-                />
+              <div className="space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400">URL Slug (Computed)</label>
+                <div className="flex items-center gap-2 bg-slate-50/80 rounded-2xl px-5 py-4 border border-slate-100/50">
+                   <Link href={`/products/${form.slug}`} target="_blank" className="text-emerald-600 hover:scale-110 transition-transform">
+                      <ExternalLink className="w-3.5 h-3.5" />
+                   </Link>
+                   <input
+                    required
+                    type="text"
+                    value={form.slug}
+                    className="flex-1 bg-transparent border-none p-0 text-sm font-semibold text-slate-500 focus:ring-0"
+                    placeholder="article-slug"
+                    readOnly
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-1.5">
-                  Category <span className="text-red-500">*</span>
-                </label>
+              <div className="space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400">Article Hierarchy (Category)</label>
                 <select
                   required
                   value={form.categoryId}
-                  onChange={(e) =>
-                    setForm({ ...form, categoryId: e.target.value })
-                  }
-                  className="w-full border border-zinc-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+                  onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+                  className="w-full bg-slate-50/80 border-none rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-all appearance-none"
                 >
-                  <option value="">Select category...</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
+                  <option value="">Select Curated Collection</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-1.5">
-                  Price (₹) <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  required
-                  value={form.price}
-                  onChange={(e) => setForm({ ...form, price: e.target.value })}
-                  className="w-full border border-zinc-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  placeholder="2499"
-                />
+              <div className="md:col-span-2 space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 font-bold">Price Point</label>
+                <div className="relative">
+                   <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 font-serif font-bold text-lg">₹</div>
+                   <input
+                    required
+                    type="number"
+                    value={form.price}
+                    onChange={(e) => setForm({ ...form, price: parseInt(e.target.value.toString()) || 0 })}
+                    className="w-full bg-slate-50/80 border-none rounded-2xl pl-12 pr-6 py-5 text-xl font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-all"
+                    placeholder="0.00"
+                  />
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Description */}
-          <div className="bg-white rounded-2xl border border-zinc-200 p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-900 mb-5">
-              Description
-            </h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-1.5">
-                  Short Description <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={form.shortDescription}
-                  onChange={(e) =>
-                    setForm({ ...form, shortDescription: e.target.value })
-                  }
-                  className="w-full border border-zinc-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  placeholder="One line description shown on product card"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-1.5">
-                  Full Description
-                </label>
+              <div className="md:col-span-2 space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400">Brief Highlights (Short Description)</label>
                 <textarea
-                  rows={4}
+                  required
+                  rows={2}
+                  value={form.shortDescription}
+                  onChange={(e) => setForm({ ...form, shortDescription: e.target.value })}
+                  className="w-full bg-slate-50/80 border-none rounded-2xl px-6 py-4 text-sm text-slate-600 leading-relaxed focus:ring-2 focus:ring-emerald-500 transition-all resize-none"
+                  placeholder="A one-sentence hook for this piece..."
+                />
+              </div>
+
+              <div className="md:col-span-2 space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400">Descriptive Narrative (Detailed Description)</label>
+                <textarea
+                  required
+                  rows={6}
                   value={form.description}
-                  onChange={(e) =>
-                    setForm({ ...form, description: e.target.value })
-                  }
-                  className="w-full border border-zinc-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
-                  placeholder="Detailed product description..."
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  className="w-full bg-slate-50/80 border-none rounded-3xl px-6 py-5 text-sm text-slate-600 leading-relaxed focus:ring-2 focus:ring-emerald-500 transition-all resize-none"
+                  placeholder="Tell the story of this piece..."
                 />
               </div>
             </div>
-          </div>
+          </section>
 
-          {/* Media & Details */}
-          <div className="bg-white rounded-2xl border border-zinc-200 p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-900 mb-5">
-              Media & Details
-            </h2>
-            <div className="space-y-4">
-              {/* ✅ ImageManager - no extra label or p tag */}
-              <ImageUploader
-                images={form.images}
-                onChange={(imgs) => setForm({ ...form, images: imgs })}
-                maxImages={5}
-              />
-
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-1.5">
-                  Sizes
-                </label>
-                <input
-                  type="text"
-                  value={form.sizes}
-                  onChange={(e) => setForm({ ...form, sizes: e.target.value })}
-                  className="w-full border border-zinc-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  placeholder="S, M, L, XL, XXL"
-                />
-                <p className="text-xs text-zinc-400 mt-1">Comma separated</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-1.5">
-                  Tags
-                </label>
-                <input
-                  type="text"
-                  value={form.tags}
-                  onChange={(e) => setForm({ ...form, tags: e.target.value })}
-                  className="w-full border border-zinc-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  placeholder="blazer, formal, mens"
-                />
-                <p className="text-xs text-zinc-400 mt-1">Comma separated</p>
-              </div>
+          <section className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-200/60 space-y-8">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-6 mb-2">
+               <h3 className="text-xl font-serif font-bold text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>Technical Detail</h3>
+               <Tag className="w-5 h-5 text-slate-200" />
             </div>
-          </div>
 
-          {/* Settings */}
-          <div className="bg-white rounded-2xl border border-zinc-200 p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-900 mb-5">
-              Settings
-            </h2>
-            <div className="space-y-4">
-              <label className="flex items-center justify-between cursor-pointer">
-                <div>
-                  <p className="text-sm font-medium text-zinc-900">
-                    Featured Product
-                  </p>
-                  <p className="text-xs text-zinc-500">
-                    Show on homepage featured section
-                  </p>
-                </div>
-                <div
-                  onClick={() =>
-                    setForm({ ...form, isFeatured: !form.isFeatured })
-                  }
-                  className={`relative w-11 h-6 rounded-full transition-colors cursor-pointer ${
-                    form.isFeatured ? "bg-brand-600" : "bg-zinc-200"
-                  }`}
-                >
-                  <span
-                    className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                      form.isFeatured ? "translate-x-5" : "translate-x-0"
-                    }`}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {[
+                { label: "Fabric & Composition", key: "fabric", placeholder: "e.g. 100% Italian Worsted Wool", icon: <Info className="w-3.5 h-3.5" /> },
+                { label: "Garment Finish", key: "finish", placeholder: "e.g. Satin Silk Lapels", icon: <Info className="w-3.5 h-3.5" /> },
+                { label: "Minimum Commitment (MOQ)", key: "moq", placeholder: "e.g. Single Bespoke Order", icon: <Info className="w-3.5 h-3.5" /> },
+                { label: "Artisanal Care", key: "care", placeholder: "e.g. Professional Dry Clean Only", icon: <Info className="w-3.5 h-3.5" /> },
+              ].map((spec) => (
+                <div key={spec.key} className="space-y-2">
+                  <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                    {spec.icon} {spec.label}
+                  </label>
+                  <input
+                    type="text"
+                    value={(form as any)[spec.key]}
+                    onChange={(e) => setForm({ ...form, [spec.key]: e.target.value })}
+                    className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-all"
+                    placeholder={spec.placeholder}
                   />
                 </div>
-              </label>
-
-              <label className="flex items-center justify-between cursor-pointer">
-                <div>
-                  <p className="text-sm font-medium text-zinc-900">Active</p>
-                  <p className="text-xs text-zinc-500">
-                    Show product on website
-                  </p>
-                </div>
-                <div
-                  onClick={() => setForm({ ...form, isActive: !form.isActive })}
-                  className={`relative w-11 h-6 rounded-full transition-colors cursor-pointer ${
-                    form.isActive ? "bg-brand-600" : "bg-zinc-200"
-                  }`}
-                >
-                  <span
-                    className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                      form.isActive ? "translate-x-5" : "translate-x-0"
-                    }`}
-                  />
-                </div>
-              </label>
+              ))}
             </div>
+
+            <div className="bg-emerald-50/50 p-6 rounded-3xl border border-emerald-100 flex gap-4 items-start">
+              <div className="w-10 h-10 rounded-2xl bg-white border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+                 <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div>
+                 <p className="text-xs font-bold text-emerald-900 mb-1">Curated Specification</p>
+                 <p className="text-[10px] text-emerald-700/70 leading-relaxed font-medium">
+                   These details will be showcased in the technical tab of the article page, helping clients understand the artisanal value of the piece.
+                 </p>
+              </div>
+            </div>
+          </section>
+
+          <div className="bg-slate-900 rounded-[32px] p-8 relative overflow-hidden">
+             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-3xl -translate-y-1/2 translate-x-1/2" />
+             <div className="flex gap-6 items-center">
+                <div className="w-16 h-16 rounded-[20px] bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                   <AlertCircle className="w-8 h-8 text-emerald-500" />
+                </div>
+                <div>
+                   <h4 className="text-white font-serif font-bold text-lg mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>Article Management</h4>
+                   <p className="text-slate-400 text-xs leading-relaxed max-w-sm">
+                     Ensure all metrics and descriptions are accurate before confirming updates. Changes are reflected synchronously across the storefront.
+                   </p>
+                </div>
+             </div>
+          </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="lg:col-span-12 pt-8">
             <button
-              type="submit"
+              onClick={handleSubmit}
               disabled={saving}
-              className="flex-1 bg-brand-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-brand-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-emerald-950 text-emerald-400 rounded-[32px] py-6 font-serif text-xl font-bold flex items-center justify-center gap-4 shadow-2xl shadow-emerald-900/40 hover:bg-emerald-900 hover:scale-[1.02] transition-all active:scale-95 disabled:opacity-50 border border-emerald-800/50"
             >
               {saving ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Saving...
-                </span>
+                <div className="w-6 h-6 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
               ) : (
-                "✅ Save Changes"
+                <>
+                  <Save className="w-6 h-6" />
+                  Secure Article Update
+                </>
               )}
             </button>
-            <Link
-              href="/admin/products"
-              className="px-6 py-3 rounded-xl border border-zinc-200 text-sm font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors text-center"
-            >
-              Cancel
-            </Link>
           </div>
         </form>
-      </div>
     </div>
   );
 }

@@ -2,257 +2,155 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Phone, Menu, X, ChevronRight } from "lucide-react";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/95 backdrop-blur-xl shadow-sm">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 lg:px-6">
-        {/* LOGO */}
-        <Link href="/" className="flex items-center gap-3 group">
-          {/* Custom Logo Icon */}
-          <div className="relative h-11 w-11 flex-shrink-0">
+    <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/80 backdrop-blur-xl shadow-sm">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:py-4 lg:px-8">
+        
+        {/* LOGO & BRAND */}
+        <Link href="/" className="flex items-center gap-3 group shrink-0">
+          <div className="relative h-10 w-10 md:h-12 md:w-12 flex-shrink-0">
             <svg
               viewBox="0 0 48 48"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="h-full w-full transition-transform duration-300 group-hover:scale-105"
+              className="h-full w-full transition-transform duration-500 group-hover:rotate-12"
             >
               <rect
                 width="48"
                 height="48"
-                rx="12"
-                fill="url(#logo-gradient)"
-                className="drop-shadow-md"
+                rx="14"
+                fill="#052e16" /* Deep Forest Green */
+                className="drop-shadow-lg"
               />
               <path
                 d="M16 14L32 34"
-                stroke="white"
+                stroke="#fbbf24" /* Gold */
                 strokeWidth="2.5"
                 strokeLinecap="round"
-                className="drop-shadow"
               />
               <path
                 d="M20 18L28 30"
-                stroke="white"
-                strokeWidth="2"
+                stroke="#fbbf24"
+                strokeWidth="1.5"
                 strokeLinecap="round"
-                opacity="0.7"
+                opacity="0.5"
               />
-              <circle cx="16" cy="14" r="2.5" fill="white" />
-              <circle cx="32" cy="34" r="2.5" fill="white" />
               <text
                 x="24"
-                y="30"
+                y="31"
                 fill="white"
-                fontSize="20"
-                fontWeight="bold"
+                fontSize="18"
+                fontWeight="900"
                 textAnchor="middle"
-                className="font-serif"
+                className="font-serif italic"
               >
-                L
+                S
               </text>
-              <defs>
-                <linearGradient
-                  id="logo-gradient"
-                  x1="0"
-                  y1="0"
-                  x2="48"
-                  y2="48"
-                  gradientUnits="userSpaceOnUse"
-                >
-                  <stop offset="0%" stopColor="#16a34a" />
-                  <stop offset="50%" stopColor="#15803d" />
-                  <stop offset="100%" stopColor="#14532d" />
-                </linearGradient>
-              </defs>
             </svg>
           </div>
 
-          {/* Brand Name */}
-          <div className="hidden sm:flex flex-col leading-none">
-            <span className="text-lg font-bold tracking-tight text-zinc-900 transition-colors group-hover:text-brand-600">
+          <div className="flex flex-col leading-tight">
+            <span className="text-xl md:text-2xl font-bold tracking-tight text-charcoal-900 font-serif">
               Stylish<span className="text-brand-600">Blazer</span>
             </span>
-            <span className="text-[9px] font-medium tracking-widest text-zinc-500 uppercase mt-0.5">
-              Premium Outerwear
+            <span className="text-[10px] font-semibold tracking-[0.2em] text-zinc-400 uppercase">
+              The Artisan Clothier
             </span>
           </div>
         </Link>
 
         {/* DESKTOP NAVIGATION */}
         <div className="hidden items-center gap-8 lg:flex">
-          <Link
-            href="/"
-            className="text-sm font-medium text-zinc-700 transition-colors hover:text-brand-600 relative group"
-          >
-            Home
-            <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-brand-600 transition-all group-hover:w-full" />
-          </Link>
-
-          <Link
-            href="/products"
-            className="text-sm font-medium text-zinc-700 transition-colors hover:text-brand-600 relative group"
-          >
-            All Products
-            <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-brand-600 transition-all group-hover:w-full" />
-          </Link>
-
-          <Link
-            href="/category/women-long-coats"
-            className="text-sm font-medium text-zinc-700 transition-colors hover:text-brand-600 relative group"
-          >
-            Women Coats
-            <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-brand-600 transition-all group-hover:w-full" />
-          </Link>
-          <Link
-            href="/category/mens-blazers"
-            className="text-sm font-medium text-zinc-700 transition-colors hover:text-brand-600 relative group"
-          >
-            Mens Blazers
-            <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-brand-600 transition-all group-hover:w-full" />
-          </Link>
-          <Link
-            href="/about"
-            className="text-sm font-medium text-zinc-700 transition-colors hover:text-brand-600 relative group"
-          >
-            About
-            <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-brand-600 transition-all group-hover:w-full" />
-          </Link>
-          <Link
-            href="/contact"
-            className="text-sm font-medium text-zinc-700 transition-colors hover:text-brand-600 relative group"
-          >
-            Contact
-            <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-brand-600 transition-all group-hover:w-full" />
-          </Link>
+          {[
+            { name: "Home", href: "/" },
+            { name: "Collection", href: "/products" },
+            { name: "Women", href: "/category/women-long-coats" },
+            { name: "Men", href: "/category/mens-blazers" },
+            { name: "About", href: "/about" },
+            { name: "Contact", href: "/contact" },
+          ].map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              className="text-[13px] font-semibold uppercase tracking-wider text-zinc-600 transition-all hover:text-brand-600 relative group"
+            >
+              {item.name}
+              <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-brand-600 transition-all duration-300 group-hover:w-full" />
+            </Link>
+          ))}
         </div>
 
-        {/* CTA BUTTON - Desktop */}
-        <a
-          href="tel:+911234567890"
-          className="hidden sm:flex items-center gap-2 rounded-lg bg-gradient-to-r from-brand-600 to-brand-700 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:shadow-lg hover:scale-105"
-        >
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
+        {/* CTA - Desktop */}
+        <div className="hidden sm:flex items-center gap-4">
+          <a
+            href="tel:+917906200663"
+            className="flex items-center gap-2 rounded-xl bg-charcoal-900 px-6 py-3 text-[13px] font-bold text-white shadow-lg hover:shadow-glow-green hover:bg-brand-800 transition-all duration-300 hover:scale-105"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-            />
-          </svg>
-          Call Sales
-        </a>
+            <Phone className="h-4 w-4 text-emerald-400" />
+            +91 7906200663
+          </a>
+        </div>
 
-        {/* MOBILE MENU BUTTON */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden flex items-center justify-center rounded-lg p-2.5 text-zinc-700 transition-colors hover:bg-zinc-100 active:bg-zinc-200"
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? (
-            // Close Icon
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          ) : (
-            // Hamburger Icon
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          )}
-        </button>
+        {/* MOBILE CONTACT & MENU */}
+        <div className="flex items-center gap-2 lg:hidden">
+          <a
+            href="tel:+917906200663"
+            className="flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-emerald-600 transition-colors hover:bg-emerald-100 border border-emerald-100/50 shadow-sm"
+            aria-label="Call Now"
+          >
+            <Phone className="h-4 w-4" />
+            <span className="text-[11px] font-bold tracking-tight">+91 79062</span>
+          </a>
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="flex items-center justify-center rounded-xl border border-zinc-100 p-2.5 text-zinc-700 transition-colors hover:bg-zinc-100 shadow-sm"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </nav>
 
-      {/* MOBILE MENU - Sliding Panel */}
+      {/* MOBILE MENU */}
       <div
-        className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          mobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        className={`lg:hidden overflow-hidden transition-all duration-500 ease-in-out bg-white border-t border-zinc-100 ${
+          mobileMenuOpen ? "max-h-screen opacity-100 border-b shadow-xl" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="border-t border-zinc-200 bg-white/95 backdrop-blur-xl">
-          <div className="mx-auto max-w-7xl px-4 py-4 space-y-1">
+        <div className="px-6 py-8 space-y-4">
+          {[
+            { name: "Home", href: "/" },
+            { name: "All Products", href: "/products" },
+            { name: "Women Collection", href: "/category/women-long-coats" },
+            { name: "Mens Blazers", href: "/category/mens-blazers" },
+            { name: "Our Story", href: "/about" },
+            { name: "Contact Us", href: "/contact" },
+          ].map((item) => (
             <Link
-              href="/"
+              key={item.name}
+              href={item.href}
               onClick={() => setMobileMenuOpen(false)}
-              className="block rounded-lg px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-brand-50 hover:text-brand-600"
+              className="flex items-center justify-between group py-2"
             >
-              Home
+              <span className="text-lg font-serif font-semibold text-zinc-800 group-hover:text-brand-600 transition-colors">
+                {item.name}
+              </span>
+              <ChevronRight className="h-5 w-5 text-zinc-300 group-hover:text-brand-600 transition-all group-hover:translate-x-1" />
             </Link>
-            <Link
-              href="/category/women-long-coats"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block rounded-lg px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-brand-50 hover:text-brand-600"
-            >
-              Women Coats
-            </Link>
-            <Link
-              href="/category/mens-blazers"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block rounded-lg px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-brand-50 hover:text-brand-600"
-            >
-              Mens Blazers
-            </Link>
-            <Link
-              href="/about"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block rounded-lg px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-brand-50 hover:text-brand-600"
-            >
-              About
-            </Link>
-            <Link
-              href="/contact"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block rounded-lg px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-brand-50 hover:text-brand-600"
-            >
-              Contact
-            </Link>
+          ))}
 
-            {/* Mobile CTA */}
+          <div className="pt-6 border-t border-zinc-50">
             <a
-              href="tel:+911234567890"
-              className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-brand-600 to-brand-700 px-4 py-3 text-sm font-semibold text-white shadow-md mt-3"
+              href="tel:+917906200663"
+              className="flex items-center justify-center gap-3 rounded-xl bg-emerald-600 px-6 py-4 text-sm font-bold text-white shadow-md active:scale-95 transition-all"
             >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                />
-              </svg>
-              Call Sales
+              <Phone className="h-4 w-4" />
+              Call +91 7906200663
             </a>
           </div>
         </div>

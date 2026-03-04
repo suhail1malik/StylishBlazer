@@ -68,46 +68,50 @@ export default function RootLayout({
         <Navbar />
         <main className="flex-1">{children}</main>
 
-        {/* Footer continues same as before... */}
-        <footer className="border-t border-zinc-200 bg-linear-to-b from-white to-zinc-50">
-          <div className="mx-auto max-w-7xl px-4 py-12 lg:px-6">
-            <div className="grid gap-8 text-sm md:grid-cols-4">
+        {/* Premium Dark Footer */}
+        <footer 
+          className="relative overflow-hidden border-t border-white/5"
+          style={{ background: "linear-gradient(135deg, #0f1117 0%, #1a2e1f 45%, #0f2218 100%)" }}
+        >
+          {/* Grid Lines Overlay */}
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.03] z-0"
+            style={{
+              backgroundImage:
+                "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
+              backgroundSize: "48px 48px",
+            }}
+          />
+
+          <div className="relative z-10 mx-auto max-w-7xl px-4 py-12 lg:px-6">
+            <div className="grid gap-8 text-sm grid-cols-2 md:grid-cols-4">
               {/* Brand */}
-              <div>
+              <div className="col-span-2 md:col-span-1 border-b border-white/5 pb-6 md:border-0 md:pb-0">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="h-8 w-8 rounded-lg bg-linear-to-br from-brand-600 to-brand-700" />
-                  <span className="text-base font-bold text-zinc-900">
+                  <div className="h-8 w-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold shadow-glow-green">S</div>
+                  <span className="text-base font-serif font-bold text-white tracking-wide">
                     StylishBlazer
                   </span>
                 </div>
-                <p className="text-zinc-600 leading-relaxed">
-                  Premium manufacturer of women long coats, mens blazers and
-                  woolen outerwear for retailers and brands.
+                <p className="text-slate-400 leading-relaxed text-xs md:text-sm">
+                  Premium manufacturer of luxury women coats, mens blazers and
+                  bespoke woolen outerwear for global retailers.
                 </p>
               </div>
 
               {/* Products */}
               <div>
-                <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-zinc-900">
-                  Products
+                <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">
+                  Collections
                 </h3>
-                <div className="flex flex-col gap-2 text-zinc-600">
-                  <Link
-                    href="/category/women-long-coats"
-                    className="transition-colors hover:text-brand-600"
-                  >
-                    Women Long Coats
+                <div className="flex flex-col gap-3 text-slate-400">
+                  <Link href="/category/women-long-coats" className="transition-colors hover:text-white">
+                    Women Coats
                   </Link>
-                  <Link
-                    href="/category/mens-blazers"
-                    className="transition-colors hover:text-brand-600"
-                  >
+                  <Link href="/category/mens-blazers" className="transition-colors hover:text-white">
                     Mens Blazers
                   </Link>
-                  <Link
-                    href="/category/woolen-jackets"
-                    className="transition-colors hover:text-brand-600"
-                  >
+                  <Link href="/category/woolen-jackets" className="transition-colors hover:text-white">
                     Woolen Jackets
                   </Link>
                 </div>
@@ -115,50 +119,41 @@ export default function RootLayout({
 
               {/* Company */}
               <div>
-                <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-zinc-900">
+                <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">
                   Company
                 </h3>
-                <div className="flex flex-col gap-2 text-zinc-600">
-                  <Link
-                    href="/about"
-                    className="transition-colors hover:text-brand-600"
-                  >
+                <div className="flex flex-col gap-3 text-slate-400">
+                  <Link href="/about" className="transition-colors hover:text-white">
                     About Us
                   </Link>
-                  <Link
-                    href="/contact"
-                    className="transition-colors hover:text-brand-600"
-                  >
-                    Contact
+                  <Link href="/contact" className="transition-colors hover:text-white">
+                    Contact Us
                   </Link>
-                  <Link
-                    href="/contact"
-                    className="transition-colors hover:text-brand-600"
-                  >
-                    Enquiry
+                  <Link href="/privacy" className="transition-colors hover:text-white">
+                    Privacy Policy
                   </Link>
                 </div>
               </div>
 
               {/* Contact */}
-              <div>
-                <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-zinc-900">
-                  Contact
+              <div className="col-span-2 md:col-span-1 border-t border-white/5 pt-6 md:border-0 md:pt-0">
+                <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">
+                  Inquiries
                 </h3>
-                <div className="flex flex-col gap-2 text-zinc-600">
+                <div className="flex flex-col gap-3 text-slate-400">
                   <p>Chandigarh, India</p>
-                  <p>+91-12345-67890</p>
-                  <p>sales@StylishBlazer.com</p>
+                  <p className="hover:text-white transition-colors cursor-pointer">+91-12345-67890</p>
+                  <p className="hover:text-white transition-colors cursor-pointer">sales@StylishBlazer.com</p>
                 </div>
               </div>
             </div>
 
-            <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-zinc-200 pt-8 text-xs text-zinc-500 md:flex-row">
+            <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 text-[10px] md:text-xs text-slate-500 tracking-widest uppercase md:flex-row">
               <p>
                 © {new Date().getFullYear()} StylishBlazer. All rights reserved.
               </p>
-              <p className="flex items-center gap-1">
-                Built with 💚 using Next.js & Tailwind CSS
+              <p className="flex items-center gap-1 opacity-60">
+                Premium Quality · Indian Craftsmanship
               </p>
             </div>
           </div>

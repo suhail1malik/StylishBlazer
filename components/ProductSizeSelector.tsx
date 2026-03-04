@@ -12,25 +12,26 @@ export default function ProductSizeSelector({ sizes }: Props) {
 
   return (
     <div className="mt-8">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-900">
-          Available Sizes
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+          SELECT SIZE
         </h3>
         {selectedSize && (
-          <span className="text-xs font-semibold text-brand-600 bg-brand-50 px-2 py-1 rounded-full">
+          <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest flex items-center gap-1.5">
+            <span className="w-1 h-1 rounded-full bg-emerald-500" />
             Selected: {selectedSize}
           </span>
         )}
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-3">
         {sizes.map((size) => (
           <button
             key={size}
             onClick={() => setSelectedSize(selectedSize === size ? "" : size)}
-            className={`rounded-lg border-2 px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+            className={`min-w-[56px] text-center rounded-xl border-2 py-3 px-4 text-xs font-bold transition-all duration-300 ${
               selectedSize === size
-                ? "border-brand-600 bg-brand-600 text-white shadow-md scale-105"
-                : "border-zinc-300 bg-white text-zinc-700 hover:border-brand-400 hover:text-brand-600"
+                ? "border-emerald-600 bg-emerald-50 text-emerald-700 shadow-sm"
+                : "border-slate-100 bg-white text-slate-600 hover:border-emerald-200 hover:text-emerald-600"
             }`}
           >
             {size}

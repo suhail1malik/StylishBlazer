@@ -37,6 +37,12 @@ model Product {
   isActive         Boolean  @default(true)
   isFeatured       Boolean  @default(false)
   
+  // Dynamic Specifications
+  fabric           String?
+  moq              String?
+  care             String?
+  finish           String?
+  
   categoryId       String   @db.ObjectId
   category         Category @relation(fields: [categoryId], references: [id])
   
@@ -58,16 +64,18 @@ model Page {
 }
 
 model Enquiry {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  email       String
-  phone       String
-  productName String?
-  message     String
-  status      String   @default("new")  // new | replied | closed
-  source      String   @default("contact") // contact | product
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String
+  phone        String
+  productName  String?
+  productImage String?
+  productUrl   String?
+  message      String
+  status       String   @default("new")  // new | replied | closed
+  source       String   @default("contact") // contact | product
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 

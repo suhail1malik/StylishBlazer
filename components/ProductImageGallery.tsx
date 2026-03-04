@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import { Sparkles } from "lucide-react";
 
 interface Props {
   images: string[];
@@ -16,48 +17,23 @@ export default function ProductImageGallery({
   const [selectedImage, setSelectedImage] = useState(0);
 
   return (
-    <div className="space-y-4">
-      {/* Main Image */}
-      <div className="relative aspect-3/4 overflow-hidden rounded-2xl border border-zinc-200 bg-gradient-to-br from-zinc-100 to-zinc-200 shadow-md">
-        {images && images.length > 0 ? (
-          <Image
-            src={images[selectedImage]}
-            alt={productName}
-            fill
-            className="object-cover transition-all duration-300"
-            priority
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full text-7xl text-zinc-300">
-            🧥
-          </div>
-        )}
-        <div className="absolute left-4 top-4 rounded-full bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white shadow-md">
-          Premium Quality
-        </div>
-        {isFeatured && (
-          <div className="absolute right-4 top-4 rounded-full bg-yellow-400 px-3 py-1.5 text-xs font-semibold text-yellow-900 shadow-md">
-            ⭐ Featured
-          </div>
-        )}
-      </div>
-
-      {/* Thumbnails */}
+    <div className="flex flex-col-reverse md:flex-row gap-4">
+      {/* Thumbnails - Vertical on MD desktops */}
       {images && images.length > 1 && (
-        <div className="grid grid-cols-4 gap-3">
-          {images.slice(0, 4).map((img, i) => (
+        <div className="grid grid-cols-4 md:flex md:flex-col gap-3 md:w-20 lg:w-24">
+          {images.map((img, i) => (
             <button
               key={i}
               onClick={() => setSelectedImage(i)}
-              className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${
+              className={`relative aspect-square overflow-hidden rounded-xl border-2 transition-all duration-300 ${
                 selectedImage === i
-                  ? "border-brand-600 shadow-md scale-105"
-                  : "border-transparent hover:border-brand-400"
+                  ? "border-emerald-600 ring-2 ring-emerald-500/20 scale-105"
+                  : "border-slate-100 hover:border-emerald-300"
               }`}
             >
               <Image
                 src={img}
-                alt={`${productName} ${i + 1}`}
+                alt={`${productName} thumbnail ${i + 1}`}
                 fill
                 className="object-cover"
               />
@@ -65,6 +41,29 @@ export default function ProductImageGallery({
           ))}
         </div>
       )}
+
+      {/* Main Image Container */}
+      <div className="relative flex-1 aspect-[3/4] md:aspect-square overflow-hidden rounded-[32px] md:rounded-[48px] border border-slate-100 bg-white shadow-premium">
+        {images && images.length > 0 ? (
+          <Image
+            src={images[selectedImage]}
+            alt={productName}
+            fill
+            className="object-cover transition-transform duration-1000"
+            priority
+          />
+        ) : (
+          <div className="flex items-center justify-center h-full text-7xl text-slate-200">
+            🧥
+          </div>
+        )}
+
+        {isFeatured && (
+          <div className="absolute right-6 top-6 bg-amber-400 text-white px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg">
+            Signature Piece
+          </div>
+        )}
+      </div>
     </div>
   );
 }

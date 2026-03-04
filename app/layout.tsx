@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "LookLikeStitches | Premium Women Coats & Mens Blazers",
+  title: "StylishBlazer | Premium Women Coats & Mens Blazers",
   description: "Premium Quality Outerwear Manufacturer",
 };
 
