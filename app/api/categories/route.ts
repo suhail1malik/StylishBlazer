@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
 
 // GET - Fetch all categories
 export async function GET() {
@@ -42,6 +43,8 @@ export async function POST(req: NextRequest) {
         seoDescription: seoDescription || '',
       },
     });
+    revalidatePath('/')
+    revalidatePath('/products')
     return NextResponse.json(category, { status: 201 });
   } catch {
     return NextResponse.json({ error: 'Create failed' }, { status: 500 });

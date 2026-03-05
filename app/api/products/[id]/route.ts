@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
@@ -99,6 +100,8 @@ export async function DELETE(
   try {
     const { id } = await params;
     await prisma.product.delete({ where: { id } });
+    revalidatePath('/')
+    revalidatePath('/products')
     return NextResponse.json({ message: "Product deleted" });
   } catch {
     return NextResponse.json({ error: "Delete failed" }, { status: 500 });

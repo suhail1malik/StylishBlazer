@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { revalidatePath } from 'next/cache'
 import { v2 as cloudinary } from 'cloudinary'
 
 cloudinary.config({
@@ -94,6 +95,13 @@ export async function POST(req: NextRequest) {
         seoDescription: body.seoDescription || '',
       },
     })
+
+
+    revalidatePath('/')
+    revalidatePath('/products')
+    if (product.category?.slug) {
+      revalidatePath(`/category/${product.category.slug}`)
+    }
 
     return NextResponse.json(product, { status: 201 })
   } catch (error: any) {

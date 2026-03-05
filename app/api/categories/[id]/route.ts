@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
 
 export async function PUT(
   req: NextRequest,
@@ -21,6 +22,11 @@ export async function PUT(
         seoDescription: seoDescription || ''
       },
     });
+
+    revalidatePath('/')
+    revalidatePath('/products')
+    revalidatePath(`/category/${category.slug}`)
+
     return NextResponse.json(category);
   } catch {
     return NextResponse.json({ error: 'Update failed' }, { status: 500 });
@@ -34,6 +40,8 @@ export async function DELETE(
   try {
     const { id } = await params;  // ← params ko await karo
     await prisma.category.delete({ where: { id } });
+    revalidatePath('/')
+    revalidatePath('/products')
     return NextResponse.json({ success: true });
   } catch (e) {
     return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
