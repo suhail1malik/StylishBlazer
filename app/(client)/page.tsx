@@ -12,7 +12,8 @@ import {
 import { ArrowRight } from "lucide-react";
 import { revalidatePath } from "next/cache";
 
-export const revalidate = 30; // revalidate every 30 seconds
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 export const metadata: Metadata = {
   title: "Premium Women Coats & Mens Blazers Manufacturer | StylishBlazer",
