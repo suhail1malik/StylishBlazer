@@ -289,8 +289,8 @@ export default function AdminProductEditPage() {
                 form.isFeatured ? "bg-amber-50/50 border-amber-100" : "bg-slate-50 border-slate-100 hover:border-slate-200"
               }`}>
                 <div>
-                  <p className="text-xs font-bold text-slate-900">Collection Spotlight</p>
-                  <p className="text-[10px] text-slate-400">Featured in Hero Sections</p>
+                  <p className="text-xs font-bold text-slate-900">Premium Selection</p>
+                  <p className="text-[10px] text-slate-400">Featured in Showcase Sections</p>
                 </div>
                 <input
                   type="checkbox"

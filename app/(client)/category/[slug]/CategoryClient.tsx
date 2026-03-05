@@ -174,8 +174,8 @@ export default function CategoryClient({
                         </span>
                       )}
                       {product.isFeatured && (
-                        <span className="bg-amber-400 text-white text-[9px] font-bold px-2 py-1 rounded-full uppercase tracking-widest shadow-lg">
-                          Featured
+                        <span className="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full text-[10px] font-bold shadow-lg border border-emerald-400/30">
+                          P
                         </span>
                       )}
                     </div>

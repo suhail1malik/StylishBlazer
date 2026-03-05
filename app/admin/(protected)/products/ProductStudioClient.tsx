@@ -265,7 +265,7 @@ function ProductRow({ product, forceExpand }: { product: any; forceExpand: boole
                          { label: 'Category', value: product.category?.name || 'Unset' },
                          { label: 'Fabric', value: product.fabric || 'Premium' },
                          { label: 'Status', value: product.isActive ? 'Visible' : 'Hidden' },
-                         { label: 'Featured', value: product.isFeatured ? 'Yes' : 'No' }
+                         { label: 'Premium', value: product.isFeatured ? 'Yes' : 'No' }
                        ].map((item, i) => (
                          <div key={i} className="p-3 bg-slate-50 rounded-xl">
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">{item.label}</p>

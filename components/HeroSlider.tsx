@@ -50,8 +50,8 @@ export default function HeroSlider({ products }: { products: Product[] }) {
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
             <div className="absolute bottom-4 left-4 right-4 text-white">
-              <h3 className="font-semibold text-sm md:text-lg">{product.name}</h3>
-              <p className="text-xs md:text-sm text-white/80">{product.shortDescription}</p>
+              <h3 className="font-semibold text-sm md:text-lg line-clamp-1">{product.name}</h3>
+              <p className="text-[10px] md:text-sm text-white/80 line-clamp-1 md:line-clamp-2">{product.shortDescription}</p>
             </div>
           </Link>
         </motion.div>

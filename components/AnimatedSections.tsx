@@ -362,7 +362,7 @@ export function FeaturedSection({ products }: { products: Product[] }) {
               className="font-serif text-3xl md:text-4xl font-bold text-slate-900"
               style={{ fontFamily: "'Playfair Display', serif" }}
             >
-              Featured Products
+              Premium Products
             </h2>
           </FadeIn>
           <FadeIn delay={0.1}>
@@ -386,8 +386,8 @@ export function FeaturedSection({ products }: { products: Product[] }) {
                 {/* Image */}
                 <div className="relative bg-slate-100 aspect-[3/4] overflow-hidden">
                   {product.isFeatured && (
-                    <span className="absolute top-3 left-3 z-10 inline-flex items-center gap-1 rounded-full bg-amber-400 text-amber-900 text-[10px] font-bold px-2.5 py-1 shadow">
-                      <Star className="w-2.5 h-2.5 fill-current" /> Featured
+                    <span className="absolute top-3 left-3 z-10 inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-600 text-white text-[10px] font-bold shadow-lg border border-emerald-400/30">
+                      P
                     </span>
                   )}
                   {product.images && product.images.length > 0 ? (

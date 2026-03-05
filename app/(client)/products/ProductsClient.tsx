@@ -177,8 +177,8 @@ export default function ProductsPage() {
                     <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     
                     {product.isFeatured && (
-                      <span className="absolute top-3 left-3 bg-amber-400 text-white text-[9px] font-bold px-2 py-1 rounded-full uppercase tracking-widest shadow-lg">
-                        Featured
+                      <span className="absolute top-3 left-3 z-10 bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full text-[10px] font-bold shadow-lg border border-emerald-400/30">
+                        P
                       </span>
                     )}
                   </div>

@@ -59,8 +59,8 @@ export default function ProductImageGallery({
         )}
 
         {isFeatured && (
-          <div className="absolute right-6 top-6 bg-amber-400 text-white px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg">
-            Signature Piece
+          <div className="absolute right-6 top-6 bg-emerald-600 text-white w-10 h-10 flex items-center justify-center rounded-full text-sm font-bold shadow-lg border border-emerald-400/30">
+            P
           </div>
         )}
       </div>

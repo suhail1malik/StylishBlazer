@@ -110,19 +110,16 @@ export default async function Home() {
                   fontSize: "clamp(1rem, 3.5vw, 3.2rem)",
                 }}
               >
-                Elevate Your Brand
-                <br />
-                with{" "}
+                High-Quality{" "}
                 <span className="text-gold-shimmer" style={{ display: "inline-block" }}>
-                  Premium Coats
+                  Blazers & Coats
                 </span>
                 <br />
-                <span className="text-emerald-400">&amp; Blazers</span>
+                <span className="text-emerald-400">Manufacturing for Retailers</span>
               </h1>
 
-              <p className="text-slate-300 text-[10px] md:text-sm leading-relaxed mb-4 md:mb-6 max-w-lg line-clamp-3 md:line-clamp-none">
-                StylishBlazer crafts high-quality women long coats, mens blazers,
-                and custom woolen outerwear.
+              <p className="text-slate-300 text-[10px] md:text-sm leading-relaxed mb-4 md:mb-6 max-w-lg line-clamp-2">
+                High-quality outerwear manufacturing for fashion brands, retailers and bulk buyers.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mb-6 md:mb-10">

@@ -199,7 +199,9 @@ export default async function ProductPage({ params }: Props) {
                     ₹{product.price.toLocaleString("en-IN")}
                   </p>
                 )}
-                <span className="text-xs text-slate-400 uppercase tracking-widest font-medium ml-1">GST Incl.</span>
+                <span className="text-[10px] text-emerald-600 uppercase tracking-widest font-bold ml-1 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+                  MOQ: {product.moq || "50 Pcs"}
+                </span>
               </div>
 
               {/* Enhanced Description Area */}
