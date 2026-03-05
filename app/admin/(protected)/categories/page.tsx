@@ -80,24 +80,28 @@ export default function AdminCategoriesPage() {
       seoTitle: form.seoTitle,
       seoDescription: form.seoDescription,
     };
-    if (editingId) {
-      await fetch(`/api/categories/${editingId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+    const res = editingId 
+      ? await fetch(`/api/categories/${editingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+      : await fetch("/api/categories", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+    if (res.ok) {
+      setShowForm(false);
+      setEditingId(null);
+      setForm(EMPTY_FORM);
+      fetchCategories();
     } else {
-      await fetch("/api/categories", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const data = await res.json();
+      alert(`Operation failed: ${data.error || 'Unknown error'}`);
     }
     setSaving(false);
-    setShowForm(false);
-    setEditingId(null);
-    setForm(EMPTY_FORM);
-    fetchCategories();
   };
 
   const handleEdit = (cat: Category) => {

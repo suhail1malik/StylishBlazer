@@ -53,6 +53,7 @@ export default function AdminProductEditPage() {
     finish: "",
     seoTitle: "",
     seoDescription: "",
+    tags: [] as string[],
   });
 
   useEffect(() => {
@@ -83,6 +84,7 @@ export default function AdminProductEditPage() {
             finish: product.finish || "",
             seoTitle: product.seoTitle || "",
             seoDescription: product.seoDescription || "",
+            tags: product.tags || [],
           });
         }
       } catch (err) {
@@ -110,9 +112,13 @@ export default function AdminProductEditPage() {
       if (res.ok) {
         router.push("/admin/products");
         router.refresh();
+      } else {
+        const data = await res.json();
+        alert(`Update failed: ${data.error || 'Unknown error'}`);
       }
     } catch (err) {
       console.error(err);
+      alert("Something went wrong during update.");
     } finally {
       setSaving(false);
     }
@@ -127,6 +133,68 @@ export default function AdminProductEditPage() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleTagsChange = (newTags: string[]) => {
+    setForm(prev => ({ ...prev, tags: newTags }));
+  };
+
+  const TagInput = ({ tags, onChange }: { tags: string[], onChange: (tags: string[]) => void }) => {
+    const [input, setInput] = useState("");
+    
+    const addTag = () => {
+      const trimmed = input.trim();
+      if (trimmed && !tags.includes(trimmed)) {
+        onChange([...tags, trimmed]);
+        setInput("");
+      }
+    };
+
+    const removeTag = (tagToRemove: string) => {
+      onChange(tags.filter(t => t !== tagToRemove));
+    };
+
+    return (
+      <div className="space-y-3">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                addTag();
+              }
+            }}
+            placeholder="Add a tag..."
+            className="flex-1 bg-slate-50 border-none rounded-xl px-4 py-3 text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-all"
+          />
+          <button
+            type="button"
+            onClick={addTag}
+            className="bg-emerald-950 text-white px-4 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-900"
+          >
+            Add
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <span key={tag} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-[10px] font-bold border border-emerald-100/50 group">
+              {tag}
+              <button 
+                type="button"
+                onClick={() => removeTag(tag)}
+                className="text-emerald-400 hover:text-emerald-600"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+          {tags.length === 0 && <p className="text-[10px] text-slate-400 font-medium px-1">No tags added yet.</p>}
+        </div>
+      </div>
+    );
   };
 
   if (loading) return (
@@ -354,6 +422,14 @@ export default function AdminProductEditPage() {
                   />
                 </div>
               ))}
+              
+              <div className="md:col-span-2 space-y-2">
+                <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  <Tag className="w-3.5 h-3.5" /> Discovery Tags
+                </label>
+                <TagInput tags={form.tags} onChange={handleTagsChange} />
+                <p className="text-[10px] text-slate-400 font-medium px-1">Used for filtering and search results categorization.</p>
+              </div>
             </div>
 
             <div className="bg-emerald-50/50 p-6 rounded-3xl border border-emerald-100 flex gap-4 items-start">
