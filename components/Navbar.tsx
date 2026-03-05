@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Phone, Menu, X, ChevronRight } from "lucide-react";
+import Image from "next/image";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -14,44 +15,13 @@ export function Navbar() {
         {/* LOGO & BRAND */}
         <Link href="/" className="flex items-center gap-3 group min-w-0">
           <div className="relative h-10 w-10 md:h-12 md:w-12 flex-shrink-0">
-            <svg
-              viewBox="0 0 48 48"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-full w-full transition-transform duration-500 group-hover:rotate-12"
-            >
-              <rect
-                width="48"
-                height="48"
-                rx="14"
-                fill="#052e16" /* Deep Forest Green */
-                className="drop-shadow-lg"
-              />
-              <path
-                d="M16 14L32 34"
-                stroke="#fbbf24" /* Gold */
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-              <path
-                d="M20 18L28 30"
-                stroke="#fbbf24"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                opacity="0.5"
-              />
-              <text
-                x="24"
-                y="31"
-                fill="white"
-                fontSize="18"
-                fontWeight="900"
-                textAnchor="middle"
-                className="font-serif italic"
-              >
-                S
-              </text>
-            </svg>
+            <Image
+              src="/logo.png"
+              alt="StylishBlazer Logo"
+              fill
+              className="object-contain transition-transform duration-500 group-hover:scale-110"
+              priority
+            />
           </div>
 
           <div className="flex flex-col leading-tight">

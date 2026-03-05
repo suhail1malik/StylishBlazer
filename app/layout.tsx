@@ -24,6 +24,10 @@ export const metadata: Metadata = {
     title: "StylishBlazer",
     description: "Premium Quality Outerwear Manufacturer",
   },
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

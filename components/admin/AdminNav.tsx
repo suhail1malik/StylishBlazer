@@ -15,6 +15,7 @@ import {
   Globe
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 type User = {
   name?: string | null;
@@ -70,8 +71,13 @@ export default function AdminNav({ user }: { user?: User }) {
           <div className="flex items-center justify-between w-full md:w-auto">
             {/* Logo */}
             <Link href="/admin" className="flex items-center gap-3 transition-opacity hover:opacity-80 group">
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-950 rounded-lg md:rounded-xl flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-900/10 group-hover:scale-105 transition-transform duration-300">
-                <Briefcase className="w-4 h-4 md:w-5 md:h-5" />
+              <div className="relative w-8 h-8 md:w-10 md:h-10 group-hover:scale-105 transition-transform duration-300">
+                <Image
+                  src="/logo.png"
+                  alt="StylishBlazer Admin Logo"
+                  fill
+                  className="object-contain"
+                />
               </div>
               <div>
                 <div className="font-serif font-bold text-slate-900 tracking-tight text-base md:text-lg leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>

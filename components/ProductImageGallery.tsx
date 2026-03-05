@@ -43,7 +43,7 @@ export default function ProductImageGallery({
       )}
 
       {/* Main Image Container */}
-      <div className="relative flex-1 aspect-[3/4] md:aspect-square overflow-hidden rounded-[32px] md:rounded-[48px] border border-slate-100 bg-white shadow-premium">
+      <div className="relative flex-1 aspect-[3/4]  overflow-hidden rounded-[32px] md:rounded-[48px] border border-slate-100 bg-white shadow-premium">
         {images && images.length > 0 ? (
           <Image
             src={images[selectedImage]}

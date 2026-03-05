@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -52,8 +53,13 @@ export default function AdminLogin() {
         {/* Logo & Header */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <div className="w-16 h-16 bg-emerald-600 rounded-2xl flex items-center justify-center text-white text-2xl mx-auto mb-4">
-              👔
+            <div className="relative w-20 h-20 mx-auto mb-4">
+              <Image
+                src="/logo.png"
+                alt="StylishBlazer Logo"
+                fill
+                className="object-contain"
+              />
             </div>
           </Link>
           <h1 className="text-3xl font-bold text-white mb-2">Admin Login</h1>

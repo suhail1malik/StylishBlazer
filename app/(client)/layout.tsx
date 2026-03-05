@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
+import Image from "next/image";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,10 +37,10 @@ export const metadata: Metadata = {
       "Premium manufacturer of women coats and mens blazers. Bulk orders, custom sizing, and wholesale pricing available.",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/logo.png",
         width: 1200,
-        height: 630,
-        alt: "StylishBlazer Premium Outerwear",
+        height: 1200,
+        alt: "StylishBlazer Premium Logo",
       },
     ],
   },
@@ -48,7 +49,11 @@ export const metadata: Metadata = {
     title: "StylishBlazer | Premium Outerwear Manufacturer",
     description:
       "Premium manufacturer of women coats and mens blazers. Bulk orders welcome.",
-    images: ["/og-image.jpg"],
+    images: ["/logo.png"],
+  },
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
   },
   robots: {
     index: true,
@@ -88,7 +93,14 @@ export default function RootLayout({
               {/* Brand */}
               <div className="col-span-2 md:col-span-1 border-b border-white/5 pb-6 md:border-0 md:pb-0">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="h-8 w-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold shadow-glow-green">S</div>
+                  <div className="relative h-10 w-10">
+                    <Image
+                      src="/logo.png"
+                      alt="StylishBlazer Logo"
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
                   <span className="text-base font-serif font-bold text-white tracking-wide">
                     StylishBlazer
                   </span>
