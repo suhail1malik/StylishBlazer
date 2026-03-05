@@ -94,6 +94,7 @@ export async function POST(req: NextRequest) {
         seoTitle: body.seoTitle || '',
         seoDescription: body.seoDescription || '',
       },
+      include: { category: true },
     })
 
 
