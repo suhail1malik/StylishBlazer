@@ -37,15 +37,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const productUrl = `${baseUrl}/products/${slug}`;
   const imageUrl = product.images?.[0] ? `${baseUrl}${product.images[0]}` : `${baseUrl}/og-image.jpg`;
 
+  const productTitle = product.seoTitle || `${product.name} | StylishBlazer`;
+  const productDescription = product.seoDescription || product.shortDescription;
+
   return {
-    title: `${product.name} | StylishBlazer`,
-    description: product.shortDescription,
+    title: productTitle,
+    description: productDescription,
     alternates: {
       canonical: productUrl,
     },
     openGraph: {
-      title: `${product.name} | Premium Collection`,
-      description: product.shortDescription,
+      title: product.seoTitle || `${product.name} | Premium Collection`,
+      description: productDescription,
       url: productUrl,
       siteName: "StylishBlazer",
       images: [
@@ -61,8 +64,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: product.name,
-      description: product.shortDescription,
+      title: product.seoTitle || product.name,
+      description: productDescription,
       images: [imageUrl],
     },
   };

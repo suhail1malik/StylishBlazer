@@ -8,7 +8,8 @@ import {
   X, 
   ArrowUpDown,
   Layers,
-  ShoppingBag
+  ShoppingBag,
+  Search
 } from "lucide-react";
 import CategoryListClient from "./CategoryListClient";
 
@@ -23,9 +24,9 @@ interface Category {
   _count: { products: number };
 }
 
-type FormState = { name: string; description: string; order: number; image: string };
+type FormState = { name: string; description: string; order: number; image: string; seoTitle: string; seoDescription: string };
 
-const EMPTY_FORM: FormState = { name: "", description: "", order: 0, image: "" };
+const EMPTY_FORM: FormState = { name: "", description: "", order: 0, image: "", seoTitle: "", seoDescription: "" };
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -76,6 +77,8 @@ export default function AdminCategoriesPage() {
       description: form.description,
       order: form.order,
       image: form.image || null,
+      seoTitle: form.seoTitle,
+      seoDescription: form.seoDescription,
     };
     if (editingId) {
       await fetch(`/api/categories/${editingId}`, {
@@ -98,7 +101,14 @@ export default function AdminCategoriesPage() {
   };
 
   const handleEdit = (cat: Category) => {
-    setForm({ name: cat.name, description: cat.description, order: cat.order, image: cat.image ?? "" });
+    setForm({ 
+      name: cat.name, 
+      description: cat.description, 
+      order: cat.order, 
+      image: cat.image ?? "",
+      seoTitle: (cat as any).seoTitle || "",
+      seoDescription: (cat as any).seoDescription || ""
+    });
     setEditingId(cat.id);
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -273,6 +283,40 @@ export default function AdminCategoriesPage() {
                       />
                     </div>
                     <p className="text-[10px] text-slate-400 mt-2 font-medium">Lower numbers appear first on the storefront.</p>
+                  </div>
+                </div>
+
+                {/* SEO Section for Category */}
+                <div className="pt-8 border-t border-slate-100 space-y-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Search className="w-4 h-4 text-emerald-600" />
+                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-emerald-600">SEO Optimization</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="md:col-span-2">
+                      <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">
+                        SEO Meta Title
+                      </label>
+                      <input
+                        value={form.seoTitle}
+                        onChange={(e) => setForm({ ...form, seoTitle: e.target.value })}
+                        placeholder="Recommended: 50-60 characters"
+                        className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-all"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">
+                        SEO Meta Description
+                      </label>
+                      <textarea
+                        value={form.seoDescription}
+                        onChange={(e) => setForm({ ...form, seoDescription: e.target.value })}
+                        placeholder="Recommended: 150-160 characters"
+                        rows={3}
+                        className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm text-slate-600 focus:ring-2 focus:ring-emerald-500 transition-all resize-none"
+                      />
+                    </div>
                   </div>
                 </div>
 

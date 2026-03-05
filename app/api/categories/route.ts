@@ -28,7 +28,7 @@ export async function GET() {
 // POST - Create new category (Admin only)
 export async function POST(req: NextRequest) {
   try {
-    const { name, description, order, image } = await req.json();
+    const { name, description, order, image, seoTitle, seoDescription } = await req.json();
     const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
     const category = await prisma.category.create({
       data: {
@@ -38,6 +38,8 @@ export async function POST(req: NextRequest) {
         isActive: true,
         order: order || 0,
         image: image || null,
+        seoTitle: seoTitle || '',
+        seoDescription: seoDescription || '',
       },
     });
     return NextResponse.json(category, { status: 201 });

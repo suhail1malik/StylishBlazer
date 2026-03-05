@@ -7,11 +7,19 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const { name, description, order, image } = await req.json();
+    const { name, description, order, image, seoTitle, seoDescription } = await req.json();
     const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
     const category = await prisma.category.update({
       where: { id },
-      data: { name, slug, description, order: order || 0, image: image ?? null },
+      data: {
+        name,
+        slug,
+        description,
+        order: order || 0,
+        image: image ?? null,
+        seoTitle: seoTitle || '',
+        seoDescription: seoDescription || ''
+      },
     });
     return NextResponse.json(category);
   } catch {

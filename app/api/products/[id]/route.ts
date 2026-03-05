@@ -77,6 +77,8 @@ export async function PATCH(
         moq: body.moq,
         care: body.care,
         finish: body.finish,
+        seoTitle: body.seoTitle,
+        seoDescription: body.seoDescription,
       },
       include: { category: true },
     });

@@ -90,6 +90,8 @@ export async function POST(req: NextRequest) {
         moq: body.moq || '',
         care: body.care || '',
         finish: body.finish || '',
+        seoTitle: body.seoTitle || '',
+        seoDescription: body.seoDescription || '',
       },
     })
 

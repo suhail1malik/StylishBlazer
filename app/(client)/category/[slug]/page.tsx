@@ -25,15 +25,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const categoryUrl = `${baseUrl}/category/${slug}`;
   const imageUrl = category.image ? `${baseUrl}${category.image}` : `${baseUrl}/og-category.jpg`;
 
+  const seoTitle = (category as any).seoTitle || `${category.name} | StylishBlazer Collection`;
+  const seoDescription = (category as any).seoDescription || category.description || `Explore our premium ${category.name} collection at StylishBlazer.`;
+
   return {
-    title: `${category.name} | StylishBlazer Collection`,
-    description: category.description || `Explore our premium ${category.name} collection at StylishBlazer.`,
+    title: seoTitle,
+    description: seoDescription,
     alternates: {
       canonical: categoryUrl,
     },
     openGraph: {
-      title: `${category.name} | Premium Collection`,
-      description: category.description || `Discover meticulously crafted ${category.name}.`,
+      title: (category as any).seoTitle || `${category.name} | Premium Collection`,
+      description: seoDescription,
       url: categoryUrl,
       siteName: "StylishBlazer",
       images: [
@@ -49,8 +52,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: category.name,
-      description: category.description || `Explore the ${category.name} collection.`,
+      title: (category as any).seoTitle || category.name,
+      description: seoDescription,
       images: [imageUrl],
     },
   };

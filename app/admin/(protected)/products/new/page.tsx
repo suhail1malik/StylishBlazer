@@ -14,7 +14,8 @@ import {
   UploadCloud,
   X,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Search
 } from "lucide-react";
 
 import ImageUploader from "@/components/admin/ImageUploader";
@@ -45,6 +46,8 @@ export default function AdminProductNewPage() {
     care: "",
     moq: "",
     finish: "",
+    seoTitle: "",
+    seoDescription: "",
   });
 
   useEffect(() => {
@@ -299,6 +302,39 @@ export default function AdminProductNewPage() {
                   />
                 </div>
               ))}
+            </div>
+          </section>
+
+          <section className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-200/60 space-y-8">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-6 mb-2">
+               <h3 className="text-xl font-serif font-bold text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>SEO Optimization</h3>
+               <Search className="w-5 h-5 text-slate-200" />
+            </div>
+
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-emerald-600">SEO Meta Title</label>
+                <input
+                  type="text"
+                  value={form.seoTitle}
+                  onChange={(e) => setForm({ ...form, seoTitle: e.target.value })}
+                  className="w-full bg-slate-50/80 border-none rounded-2xl px-6 py-4 text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-all"
+                  placeholder="Recommended: 50-60 characters"
+                />
+                <p className="text-[10px] text-slate-400 font-medium px-2">Appears as the clickable headline in search results.</p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-emerald-600">SEO Meta Description</label>
+                <textarea
+                  rows={3}
+                  value={form.seoDescription}
+                  onChange={(e) => setForm({ ...form, seoDescription: e.target.value })}
+                  className="w-full bg-slate-50/80 border-none rounded-2xl px-6 py-4 text-sm text-slate-600 leading-relaxed focus:ring-2 focus:ring-emerald-500 transition-all resize-none"
+                  placeholder="Recommended: 150-160 characters"
+                />
+                <p className="text-[10px] text-slate-400 font-medium px-2">A concise summary of the page for search engine snippets.</p>
+              </div>
             </div>
           </section>
 
