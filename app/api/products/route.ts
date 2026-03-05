@@ -1,5 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { v2 as cloudinary } from 'cloudinary'
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
+
+async function finalizeImages(images: string[]) {
+  if (!images || !Array.isArray(images)) return [];
+
+  return Promise.all(images.map(async (url) => {
+    if (url.includes('looklikestitches/temp/')) {
+      const publicId = url.match(/upload\/(?:v\d+\/)?(.+?)(?:\.[a-zA-Z]+)?$/)?.[1];
+      if (publicId) {
+        const newPublicId = publicId.replace('looklikestitches/temp/', 'looklikestitches/products/');
+        try {
+          const result = await cloudinary.uploader.rename(publicId, newPublicId, { invalidate: true });
+          return result.secure_url;
+        } catch (e) {
+          console.error("Failed to rename image in cloudinary", e);
+          return url;
+        }
+      }
+    }
+    return url;
+  }));
+}
+
 
 export async function GET(req: NextRequest) {
   try {
@@ -42,6 +71,8 @@ export async function POST(req: NextRequest) {
     const existing = await prisma.product.findUnique({ where: { slug: body.slug } })
     const finalSlug = existing ? `${body.slug}-${Date.now()}` : body.slug
 
+    const finalizedImages = await finalizeImages(body.images || []);
+
     const product = await prisma.product.create({
       data: {
         name: body.name,
@@ -49,7 +80,7 @@ export async function POST(req: NextRequest) {
         shortDescription: body.shortDescription,
         description: body.description || '',
         price: parseInt(body.price),
-        images: body.images || [],
+        images: finalizedImages,
         sizes: body.sizes || [],
         tags: body.tags || [],
         isFeatured: body.isFeatured || false,

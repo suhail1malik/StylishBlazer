@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     const result = await new Promise<any>((resolve, reject) => {
       cloudinary.uploader.upload_stream(
         {
-          folder: 'looklikestitches/products',
+          folder: 'looklikestitches/temp',
           transformation: [
             { quality: 'auto:best' },
             { fetch_format: 'auto' },

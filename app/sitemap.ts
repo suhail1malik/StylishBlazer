@@ -18,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const categoryUrls = categories.map((c) => ({
-    url: `https://stylishblazer.in/categories/${c.slug}`,
+    url: `https://stylishblazer.in/category/${c.slug}`,
     lastModified: c.updatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.7,

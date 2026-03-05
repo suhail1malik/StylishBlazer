@@ -3,17 +3,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   Plus, 
-  Pencil, 
   Trash2, 
   Image as ImageIcon, 
   X, 
-  Check, 
-  Pause,
   ArrowUpDown,
   Layers,
-  ShoppingBag,
-  ExternalLink
+  ShoppingBag
 } from "lucide-react";
+import CategoryListClient from "./CategoryListClient";
 
 interface Category {
   id: string;
@@ -301,109 +298,24 @@ export default function AdminCategoriesPage() {
         </div>
       )}
 
-      {/* ── Grid of Categories ────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading ? (
-          [1,2,3].map(n => (
+      {/* ── Categories List Section ──────────────────────────────────── */}
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1,2,3].map(n => (
             <div key={n} className="bg-white rounded-[32px] p-6 h-[200px] animate-pulse border border-slate-100">
               <div className="w-12 h-12 bg-slate-50 rounded-2xl mb-4" />
               <div className="h-4 w-32 bg-slate-50 rounded mb-2" />
               <div className="h-3 w-48 bg-slate-50 rounded" />
             </div>
-          ))
-        ) : categories.length === 0 ? (
-          <div className="col-span-full py-24 text-center bg-white rounded-[32px] border border-dashed border-slate-200">
-             <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-[32px] flex items-center justify-center mx-auto mb-6">
-               <Layers className="w-10 h-10" />
-             </div>
-             <h3 className="text-xl font-serif font-bold text-slate-900 mb-2">No Categories Defined</h3>
-             <p className="text-slate-400 text-sm max-w-xs mx-auto mb-8 leading-relaxed">
-               Your store currently has no collections. Start by adding your first category.
-             </p>
-             <button onClick={openAddForm} className="text-emerald-600 font-bold uppercase tracking-widest text-[10px] hover:underline">
-               Start Curating +
-             </button>
-          </div>
-        ) : (
-          categories.map((cat) => (
-            <div 
-              key={cat.id} 
-              className="group bg-white rounded-[32px] overflow-hidden border border-slate-200/60 shadow-sm hover:shadow-premium transition-all duration-500"
-            >
-              <div className="aspect-[16/10] relative overflow-hidden bg-slate-100">
-                {cat.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={cat.image} alt={cat.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-slate-300">
-                    <Layers className="w-12 h-12 stroke-[1.5]" />
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                
-                <div className="absolute top-4 right-4 flex items-center gap-2">
-                   <span className={`px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-widest backdrop-blur-md border ${
-                     cat.isActive 
-                       ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600" 
-                       : "bg-slate-500/10 border-slate-500/20 text-slate-500"
-                   }`}>
-                     {cat.isActive ? "Active" : "Hidden"}
-                   </span>
-                </div>
-              </div>
-
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-2">
-                   <div>
-                     <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 mb-1 block">
-                       #{cat.order} In Hierarchy
-                     </span>
-                     <h3 className="text-lg font-serif font-bold text-slate-900 leading-tight tracking-tight">
-                       {cat.name}
-                     </h3>
-                   </div>
-                   <div className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center shrink-0">
-                      <span className="text-[10px] font-bold text-slate-900 leading-none">{cat._count.products}</span>
-                      <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400 leading-none mt-1">Items</span>
-                   </div>
-                </div>
-
-                <p className="text-sm text-slate-500 line-clamp-2 mb-6 min-h-[40px] leading-relaxed">
-                  {cat.description || "No narrative provided for this collection."}
-                </p>
-
-                <div className="flex items-center gap-2 pt-6 border-t border-slate-100 mt-auto">
-                  <button
-                    onClick={() => handleEdit(cat)}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-50 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition-all font-bold text-[10px] uppercase tracking-widest"
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(cat.id, cat._count.products)}
-                    disabled={cat._count.products > 0}
-                    className={`p-3 rounded-xl transition-all ${
-                      cat._count.products > 0 
-                        ? "bg-slate-50 text-slate-300 cursor-not-allowed" 
-                        : "bg-red-50 text-red-600 hover:bg-red-100"
-                    }`}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                  <Link 
-                    href={`/category/${cat.slug}`}
-                    target="_blank"
-                    className="p-3 rounded-xl bg-slate-50 text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <CategoryListClient 
+          categories={categories} 
+          onEdit={handleEdit} 
+          onDelete={handleDelete} 
+        />
+      )}
 
       {/* ── Stat Footer ───────────────────────────────────────────────── */}
       {!loading && (

@@ -5,8 +5,25 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "StylishBlazer | Premium Women Coats & Mens Blazers",
-  description: "Premium Quality Outerwear Manufacturer",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://stylishblazer.in"),
+  title: {
+    template: "%s | StylishBlazer",
+    default: "StylishBlazer | Premium Women Coats & Mens Blazers",
+  },
+  description: "Premium Quality Outerwear Manufacturer, specializing in bespoke woven designs spanning formal wear to casual chic.",
+  openGraph: {
+    title: "StylishBlazer | Premium Women Coats & Mens Blazers",
+    description: "Premium Quality Outerwear Manufacturer",
+    url: "https://stylishblazer.in",
+    siteName: "StylishBlazer",
+    locale: "en_IN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "StylishBlazer",
+    description: "Premium Quality Outerwear Manufacturer",
+  },
 };
 
 export default function RootLayout({
