@@ -18,6 +18,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
+
 // ── Reusable fade-in wrapper ──────────────────────────────────────────────────
 export function FadeIn({
   children,
@@ -29,13 +30,15 @@ export function FadeIn({
   className?: string;
 }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  // ✅ FIX 1: margin "0px" - viewport edge pe trigger hoga, pehle nahi
+  const isInView = useInView(ref, { once: true, margin: "0px" });
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 32 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      // ✅ FIX 2: y: 32 hataya - scroll/jump effect band hoga
+      initial={{ opacity: 0 }}
+      animate={isInView ? { opacity: 1 } : {}}
       transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
@@ -43,6 +46,7 @@ export function FadeIn({
     </motion.div>
   );
 }
+
 
 // ── Staggered grid wrapper ────────────────────────────────────────────────────
 export function StaggerGrid({
@@ -53,7 +57,8 @@ export function StaggerGrid({
   className?: string;
 }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
+  // ✅ FIX 3: margin "0px" - consistent behaviour
+  const isInView = useInView(ref, { once: true, margin: "0px" });
 
   return (
     <motion.div
@@ -71,18 +76,21 @@ export function StaggerGrid({
   );
 }
 
+
 export function StaggerItem({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: 28 },
-        show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
+        // ✅ FIX 4: y: 28 hataya StaggerItem se bhi - consistent
+        hidden: { opacity: 0 },
+        show: { opacity: 1, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
       }}
     >
       {children}
     </motion.div>
   );
 }
+
 
 // ── Section heading ───────────────────────────────────────────────────────────
 export function SectionHeading({
@@ -126,6 +134,7 @@ export function SectionHeading({
   );
 }
 
+
 // ── Stats section ─────────────────────────────────────────────────────────────
 export function StatsSection() {
   const stats = [
@@ -137,7 +146,6 @@ export function StatsSection() {
 
   return (
     <section className="relative py-4 md:py-4 overflow-hidden" style={{ background: "#0f1117" }}>
-      {/* Hero-style grid overlay */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.03] z-0"
         style={{
@@ -146,7 +154,6 @@ export function StatsSection() {
           backgroundSize: "48px 48px",
         }}
       />
-      {/* thin gold line */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-yellow-400/40 to-transparent z-10" />
       <div className="container mx-auto px-4 relative z-10">
         <StaggerGrid className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -172,6 +179,7 @@ export function StatsSection() {
     </section>
   );
 }
+
 
 // ── Features section ──────────────────────────────────────────────────────────
 export function FeaturesSection() {
@@ -205,12 +213,12 @@ export function FeaturesSection() {
       border: "border-purple-500/20",
     },
   ];
+
   return (
     <section
       className="py-4 md:py-12 relative overflow-hidden"
       style={{ background: "linear-gradient(135deg, #0f1117 0%, #1a2e1f 45%, #0f2218 100%)" }}
     >
-      {/* Hero-style grid overlay */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.03] z-0"
         style={{
@@ -219,8 +227,6 @@ export function FeaturesSection() {
           backgroundSize: "48px 48px",
         }}
       />
-      
-      {/* Subtle ambient glow */}
       <div className="pointer-events-none absolute inset-0 opacity-20" aria-hidden="true">
         <div className="absolute top-0 right-0 h-[300px] w-[300px] rounded-full bg-emerald-600/10 blur-[80px]" />
       </div>
@@ -254,11 +260,11 @@ export function FeaturesSection() {
           ))}
         </StaggerGrid>
       </div>
-      {/* thin gold line bottom */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-yellow-400/10 to-transparent" />
     </section>
   );
 }
+
 
 // ── Category types ────────────────────────────────────────────────────────────
 type Category = {
@@ -269,6 +275,7 @@ type Category = {
   image: string | null;
   _count: { products: number };
 };
+
 
 // ── Categories section ────────────────────────────────────────────────────────
 export function CategoriesSection({ categories }: { categories: Category[] }) {
@@ -289,7 +296,6 @@ export function CategoriesSection({ categories }: { categories: Category[] }) {
                 href={`/category/${category.slug}`}
                 className="group block rounded-xl md:rounded-3xl overflow-hidden border border-slate-100 shadow-soft hover:shadow-premium transition-all duration-500 bg-white"
               >
-                {/* Image area */}
                 <div className="relative h-52 md:h-82 bg-gradient-to-br from-slate-100 to-slate-200 overflow-hidden">
                   {category.image ? (
                     <Image
@@ -303,11 +309,9 @@ export function CategoriesSection({ categories }: { categories: Category[] }) {
                       <span className="text-6xl opacity-30">🧥</span>
                     </div>
                   )}
-                  {/* Gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
 
-                {/* Content */}
                 <div className="p-3 md:p-5">
                   <div className="flex flex-col md:flex-row items-start justify-between gap-1 md:gap-3">
                     <div className="flex-1 min-w-0">
@@ -337,6 +341,7 @@ export function CategoriesSection({ categories }: { categories: Category[] }) {
   );
 }
 
+
 // ── Product types ─────────────────────────────────────────────────────────────
 type Product = {
   id: string;
@@ -347,6 +352,7 @@ type Product = {
   isFeatured: boolean;
   images: string[];
 };
+
 
 // ── Featured Products section ─────────────────────────────────────────────────
 export function FeaturedSection({ products }: { products: Product[] }) {
@@ -383,7 +389,6 @@ export function FeaturedSection({ products }: { products: Product[] }) {
                 href={`/products/${product.slug}`}
                 className="group block rounded-2xl overflow-hidden border border-slate-100 bg-white shadow-soft hover:shadow-premium transition-all duration-500"
               >
-                {/* Image */}
                 <div className="relative bg-slate-100 aspect-[3/4] overflow-hidden">
                   {product.isFeatured && (
                     <span className="absolute top-3 left-3 z-10 inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-600 text-white text-[10px] font-bold shadow-lg border border-emerald-400/30">
@@ -402,11 +407,9 @@ export function FeaturedSection({ products }: { products: Product[] }) {
                       👔
                     </div>
                   )}
-                  {/* Subtle green overlay on hover */}
                   <div className="absolute inset-0 bg-brand-900/0 group-hover:bg-brand-900/10 transition-colors duration-500" />
                 </div>
 
-                {/* Details */}
                 <div className="p-4">
                   <h3
                     className="font-serif font-semibold text-sm md:text-base text-slate-900 group-hover:text-brand-600 transition-colors line-clamp-1 mb-1"
@@ -435,10 +438,11 @@ export function FeaturedSection({ products }: { products: Product[] }) {
   );
 }
 
+
 // ── CTA section ───────────────────────────────────────────────────────────────
 export function CTASection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
+  const isInView = useInView(ref, { once: true, margin: "0px" });
 
   return (
     <section
@@ -446,7 +450,6 @@ export function CTASection() {
       className="relative py-12 md:py-24 overflow-hidden"
       style={{ background: "linear-gradient(135deg, #0f1117 0%, #1a2e1f 45%, #0f2218 100%)" }}
     >
-      {/* Hero-style grid overlay */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.03] z-0"
         style={{
@@ -455,19 +458,18 @@ export function CTASection() {
           backgroundSize: "48px 48px",
         }}
       />
-      {/* decorative glows */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-emerald-400/10 blur-3xl" />
         <div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-amber-400/10 blur-3xl" />
       </div>
 
-      {/* thin gold line top */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-300/50 to-transparent z-10" />
 
       <div className="relative container mx-auto px-4 text-center">
+        {/* ✅ FIX: y: 40 hataya - sirf opacity animation */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
           <span className="inline-flex items-center gap-2 text-amber-300 text-xs font-semibold tracking-[0.18em] uppercase mb-6">

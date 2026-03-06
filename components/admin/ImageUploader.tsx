@@ -134,7 +134,11 @@ export default function ImageUploader({
     <div className="space-y-4">
       {/* Uploaded Images Grid */}
       {images.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className={`grid gap-4 md:gap-6 ${
+          maxImages === 1 
+            ? "grid-cols-1" 
+            : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+        }`}>
           {images.map((img, index) => (
             <div
               key={index}

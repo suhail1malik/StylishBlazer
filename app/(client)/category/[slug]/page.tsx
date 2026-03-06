@@ -1,6 +1,13 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import { cache } from "react";
+
+const getCategory = cache(async (slug: string) => {
+  return await prisma.category.findUnique({
+    where: { slug },
+  });
+});
 import CategoryClient from "./CategoryClient";
 
 type Props = {
@@ -9,10 +16,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-
-  const category = await prisma.category.findUnique({
-    where: { slug },
-  });
+  const category = await getCategory(slug);
 
   if (!category) {
     return {
@@ -59,12 +63,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+export async function generateStaticParams() {
+  const categories = await prisma.category.findMany({
+    where: { isActive: true },
+    select: { slug: true },
+  });
+  return categories.map((c) => ({ slug: c.slug }));
+}
+
+export const revalidate = 60;
+
 export default async function CategoryPage({ params }: Props) {
   const { slug } = await params;
-
-  const category = await prisma.category.findUnique({
-    where: { slug },
-  });
+  const category = await getCategory(slug);
 
   if (!category || !category.isActive) {
     notFound();

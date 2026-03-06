@@ -117,7 +117,7 @@ export default function RootLayout({
                   Collections
                 </h3>
                 <div className="flex flex-col gap-3 text-slate-400">
-                  <Link href="/category/women-long-coats" className="transition-colors hover:text-white">
+                  <Link href="/category/women-coats" className="transition-colors hover:text-white">
                     Women Coats
                   </Link>
                   <Link href="/category/mens-blazers" className="transition-colors hover:text-white">

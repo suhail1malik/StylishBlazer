@@ -30,23 +30,33 @@ interface Product {
   category: Category;
 }
 
-export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+export default function ProductsPage({ 
+  initialProducts, 
+  initialCategories 
+}: { 
+  initialProducts: Product[], 
+  initialCategories: Category[] 
+}) {
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [activeCategory, setActiveCategory] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/products").then((r) => r.json()),
-      fetch("/api/categories").then((r) => r.json()),
-    ]).then(([productsData, categoriesData]) => {
-      setProducts(Array.isArray(productsData) ? productsData : []);
-      setCategories(Array.isArray(categoriesData) ? categoriesData : []);
-      setLoading(false);
-    });
-  }, []);
+    // If we wanted to "refresh" data on mount, we could, but SSR handles initial state
+    if (initialProducts.length === 0 && initialCategories.length === 0) {
+      setLoading(true);
+      Promise.all([
+        fetch("/api/products").then((r) => r.json()),
+        fetch("/api/categories").then((r) => r.json()),
+      ]).then(([productsData, categoriesData]) => {
+        setProducts(Array.isArray(productsData) ? productsData : []);
+        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+        setLoading(false);
+      });
+    }
+  }, [initialProducts, initialCategories]);
 
   const filtered =
     activeCategory === "all"

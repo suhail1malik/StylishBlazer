@@ -12,6 +12,7 @@ import {
   Search
 } from "lucide-react";
 import CategoryListClient from "./CategoryListClient";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 interface Category {
   id: string;
@@ -47,25 +48,11 @@ export default function AdminCategoriesPage() {
 
   useEffect(() => { fetchCategories(); }, []);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    setUploadError("");
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (data.url) {
-        setForm((f) => ({ ...f, image: data.url }));
-      } else {
-        setUploadError(data.error || "Upload failed");
-      }
-    } catch {
-      setUploadError("Upload failed. Try again.");
-    } finally {
-      setUploading(false);
+  const handleImageChange = (uploadedImages: { url: string; publicId: string }[]) => {
+    if (uploadedImages.length > 0) {
+      setForm((f) => ({ ...f, image: uploadedImages[0].url }));
+    } else {
+      setForm((f) => ({ ...f, image: "" }));
     }
   };
 
@@ -178,68 +165,11 @@ export default function AdminCategoriesPage() {
                 <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-600 mb-2">
                   Category Aesthetic
                 </label>
-                
-                <div 
-                  className={`relative aspect-[4/5] rounded-[24px] overflow-hidden border-2 border-dashed transition-all duration-300 ${
-                    form.image ? "border-slate-200" : "border-slate-300 hover:border-emerald-400 bg-slate-50/50"
-                  }`}
-                >
-                  {form.image ? (
-                    <>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={form.image}
-                        alt="Preview"
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-slate-900/20 group hover:bg-slate-900/40 transition-colors flex items-center justify-center">
-                        <button
-                          type="button"
-                          onClick={() => setForm((f) => ({ ...f, image: "" }))}
-                          className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center opacity-0 group-hover:opacity-100 hover:scale-110 transition-all"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer p-6 text-center group">
-                      <div className="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                        <ImageIcon className="w-8 h-8" />
-                      </div>
-                      <span className="text-sm font-bold text-slate-900 mb-1">Upload Visual</span>
-                      <span className="text-xs text-slate-400 leading-relaxed">Recommended: Portrait orientation for best card display</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageUpload}
-                        disabled={uploading}
-                      />
-                    </label>
-                  )}
-                  {uploading && (
-                    <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center">
-                      <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
-                    </div>
-                  )}
-                </div>
-                {uploadError && <p className="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-wider">{uploadError}</p>}
-                
-                <div className="space-y-4 pt-4">
-                  <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">
-                       Manual URL (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      value={form.image}
-                      onChange={(e) => setForm({ ...form, image: e.target.value })}
-                      placeholder="https://..."
-                      className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-xs focus:ring-2 focus:ring-emerald-500 transition-all"
-                    />
-                  </div>
-                </div>
+                <ImageUploader 
+                  images={form.image ? [{ url: form.image, publicId: "" }] : []} 
+                  onChange={handleImageChange}
+                  maxImages={1}
+                />
               </div>
 
               {/* Right Column: Info */}

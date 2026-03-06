@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Sparkles, ChevronRight, Truck, ShieldCheck } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { cache } from "react";
 import { 
   FadeIn, 
   StaggerGrid, 
@@ -18,13 +19,16 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-
-  const product = (await prisma.product.findUnique({
+const getProduct = cache(async (slug: string) => {
+  return await prisma.product.findUnique({
     where: { slug },
     include: { category: true },
-  })) as any;
+  });
+});
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const product = (await getProduct(slug)) as any;
 
   if (!product) {
     return {
@@ -71,13 +75,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+export async function generateStaticParams() {
+  const products = await prisma.product.findMany({
+    where: { isActive: true },
+    select: { slug: true },
+  });
+  return products.map((p) => ({ slug: p.slug }));
+}
+
+export const revalidate = 60;
+
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
-
-  const product = (await prisma.product.findUnique({
-    where: { slug },
-    include: { category: true },
-  })) as any;
+  const product = (await getProduct(slug)) as any;
 
   if (!product || !product.isActive) {
     notFound();

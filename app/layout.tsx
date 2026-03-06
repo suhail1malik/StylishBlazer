@@ -37,7 +37,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} overflow-x-hidden bg-slate-50`}>{children}</body>
+      <body className={`${inter.className} overflow-x-hidden bg-slate-50`}>
+        {children}
+      </body>
     </html>
   );
 }
