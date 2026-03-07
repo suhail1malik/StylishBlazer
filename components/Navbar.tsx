@@ -97,7 +97,7 @@ export function Navbar() {
           {[
             { name: "Home", href: "/" },
             { name: "All Products", href: "/products" },
-            { name: "Women Collection", href: "/category/women-coats" },
+            { name: "Women Collection", href: "/category/women-long-coats" },
             { name: "Mens Blazers", href: "/category/mens-blazers" },
             { name: "Our Story", href: "/about" },
             { name: "Contact Us", href: "/contact" },
