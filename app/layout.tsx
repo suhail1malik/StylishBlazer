@@ -1,8 +1,18 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-playfair",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://stylishblazer.in"),
@@ -37,7 +47,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
-      <body className={`${inter.className} overflow-x-hidden bg-slate-50`}>
+      <head>
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+      </head>
+      <body className={`${inter.variable} ${playfair.variable} ${inter.className} overflow-x-hidden bg-slate-50 antialiased`}>
         {children}
       </body>
     </html>

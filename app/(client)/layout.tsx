@@ -1,21 +1,8 @@
-// app/layout.tsx
-import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
-import Link from "next/link";
+// app/(client)/layout.tsx - Removed redundant font definitions
 import { Navbar } from "@/components/Navbar";
 import Image from "next/image";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-});
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-playfair",
-});
+import Link from "next/link";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://stylishblazer.in"),
@@ -74,7 +61,7 @@ export default function RootLayout({
 }) {
   return (
     <>
-    <div className={`${inter.variable} ${playfair.variable} min-h-screen flex flex-col bg-linear-to-br from-zinc-50 via-white to-zinc-50 text-zinc-900 antialiased font-sans`}>
+    <div className="min-h-screen flex flex-col bg-linear-to-br from-zinc-50 via-white to-zinc-50 text-zinc-900 antialiased font-sans">
         {/* PREMIUM NAVBAR */}
         <Navbar />
         <main className="flex-1">{children}</main>
