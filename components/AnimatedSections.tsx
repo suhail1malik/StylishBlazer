@@ -303,7 +303,7 @@ export function CategoriesSection({ categories }: { categories: Category[] }) {
                       alt={category.name}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                   ) : (
                     <div className="h-full flex items-center justify-center">
@@ -402,7 +402,7 @@ export function FeaturedSection({ products }: { products: Product[] }) {
                       alt={product.name}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                   ) : (
                     <div className="h-full flex items-center justify-center text-5xl opacity-30">
