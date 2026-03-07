@@ -39,7 +39,7 @@ export function Navbar() {
           {[
             { name: "Home", href: "/" },
             { name: "Collection", href: "/products" },
-            { name: "Women", href: "/category/women-coats" },
+            { name: "Women", href: "/category/women-long-coats" },
             { name: "Men", href: "/category/mens-blazers" },
             { name: "About", href: "/about" },
             { name: "Contact", href: "/contact" },

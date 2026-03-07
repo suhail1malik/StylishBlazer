@@ -304,10 +304,9 @@ export default function InvoiceGenerator({ onSaveSuccess, initialData }: { onSav
               lineWidth: 0
             },
             alternateRowStyles: { fillColor: [250, 250, 250] },
-            willDrawCell: (data) => {
-              if (data.row.index >= pageItems.length) {
-                data.cell.styles.lineWidth = 0;
-              }
+            didDrawCell: (data) => {
+                // If it's a real item, draw the bottom border manually if needed
+                // Or just use 'striped' which looks cleaner without empty borders
             },
             margin: { left: 20, right: 20 },
           });
