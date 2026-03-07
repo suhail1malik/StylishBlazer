@@ -12,7 +12,8 @@ import {
   User as UserIcon,
   ChevronRight,
   Bell,
-  Globe
+  Globe,
+  FileText
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -51,6 +52,7 @@ export default function AdminNav({ user }: { user?: User }) {
     { href: "/admin", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
     { href: "/admin/products", label: "Products", icon: <Briefcase className="w-4 h-4" /> },
     { href: "/admin/categories", label: "Categories", icon: <FolderTree className="w-4 h-4" /> },
+    { href: "/admin/invoices", label: "Invoices", icon: <FileText className="w-4 h-4" /> },
     { href: "/admin/enquiries", label: "Enquiries", icon: <Mail className="w-4 h-4" />, badge: newEnquiryCount > 0 },
   ];
 

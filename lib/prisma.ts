@@ -1,16 +1,16 @@
-// lib/prisma.ts - forced update 17:55
+// lib/prisma.ts
 import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
-  prismaV2: PrismaClient | undefined;
+  prismaReset: PrismaClient | undefined;
 };
 
 export const prisma =
-  globalForPrisma.prismaV2 ??
+  globalForPrisma.prismaReset ??
   new PrismaClient({
     log: ["query", "error", "warn"],
   });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prismaV2 = prisma;
+if (process.env.NODE_ENV !== "production") globalForPrisma.prismaReset = prisma;
 
 export default prisma;

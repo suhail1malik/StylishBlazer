@@ -27,6 +27,34 @@ model Category {
   seoDescription String?
 }
 
+// Invoice Model
+model Invoice {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceNumber   String   @unique
+  date            DateTime
+  brandName       String?
+  brandGST        String?
+  clientName      String
+  clientContact   String?
+  clientEmail     String?
+  clientAddress   String?
+  clientGST       String?
+  items           Json     // Array of {description, quantity, price}
+  subtotal        Float
+  taxType         String   @default("none") // none | gst
+  cgstRate        Float    @default(9)
+  sgstRate        Float    @default(9)
+  cgst            Float    @default(0)
+  sgst            Float    @default(0)
+  total           Float
+  notes           String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("invoices")
+}
+
 // Product Model
 model Product {
   id               String   @id @default(auto()) @map("_id") @db.ObjectId

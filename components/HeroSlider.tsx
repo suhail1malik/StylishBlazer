@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
 
 type Product = {
   id: string;
@@ -16,54 +17,91 @@ type Product = {
 export default function HeroSlider({ products }: { products: Product[] }) {
   const [index, setIndex] = useState(0);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setIndex((i) => (i + 1) % products.length);
-    }, 3500);
-
-    return () => clearInterval(timer);
+  const next = useCallback(() => {
+    setIndex((i) => (i + 1) % products.length);
   }, [products.length]);
+
+  const prev = useCallback(() => {
+    setIndex((i) => (i - 1 + products.length) % products.length);
+  }, [products.length]);
+
+  useEffect(() => {
+    const timer = setInterval(next, 4500); // Slightly slower rotation
+    return () => clearInterval(timer);
+  }, [next]);
+
+  // Swipe sensitivity
+  const swipeConfidenceThreshold = 10000;
+  const swipePower = (offset: number, velocity: number) => {
+    return Math.abs(offset) * velocity;
+  };
 
   const product = products[index];
 
   return (
-    <div className="relative overflow-hidden rounded-2xl shadow-2xl group">
-      <AnimatePresence mode="wait">
+    <div className="relative overflow-hidden rounded-2xl shadow-2xl group touch-pan-y">
+      <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={product.id}
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 1.02 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="relative aspect-[4/5]"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={1}
+          onDragEnd={(e, { offset, velocity }) => {
+            const swipe = swipePower(offset.x, velocity.x);
+            if (swipe < -swipeConfidenceThreshold) {
+              next();
+            } else if (swipe > swipeConfidenceThreshold) {
+              prev();
+            }
+          }}
+          className="relative aspect-[4/5] cursor-grab active:cursor-grabbing"
         >
           <Link href={`/products/${product.slug}`} className="block h-full w-full">
             <Image
               src={product.images[0]}
               alt={product.name}
               fill
-              className="object-cover transition-transform duration-700 group-hover:scale-110"
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
               priority
             />
 
             {/* cinematic overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-            <div className="absolute bottom-4 left-4 right-4 text-white">
-              <h3 className="font-semibold text-sm md:text-lg line-clamp-1">{product.name}</h3>
-              <p className="text-[10px] md:text-sm text-white/80 line-clamp-1 md:line-clamp-2">{product.shortDescription}</p>
+            <div className="absolute bottom-6 left-6 right-6 text-white text-shadow-sm">
+              <h3 className="font-serif font-bold text-lg md:text-2xl mb-1 line-clamp-1 italic tracking-tight">{product.name}</h3>
+              <p className="text-xs md:text-sm text-white/90 line-clamp-2 leading-relaxed max-w-[85%]">{product.shortDescription}</p>
             </div>
           </Link>
         </motion.div>
       </AnimatePresence>
 
+      {/* Navigation Arrows (Desktop) */}
+      <button 
+        onClick={(e) => { e.preventDefault(); prev(); }}
+        className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex hover:bg-white hover:text-black z-20"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+      <button 
+        onClick={(e) => { e.preventDefault(); next(); }}
+        className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex hover:bg-white hover:text-black z-20"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
+
       {/* dots */}
-      <div className="absolute bottom-3 right-4 flex gap-2">
+      <div className="absolute bottom-4 left-6 flex gap-1.5 z-20">
         {products.map((_, i) => (
-          <span
+          <button
             key={i}
-            className={`h-2 w-2 rounded-full transition ${
-              i === index ? "bg-white" : "bg-white/40"
+            onClick={() => setIndex(i)}
+            className={`h-1 rounded-full transition-all duration-300 ${
+              i === index ? "w-6 bg-white" : "w-2 bg-white/30 hover:bg-white/50"
             }`}
           />
         ))}
