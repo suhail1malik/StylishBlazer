@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import { Trash2 } from "lucide-react";
 
 interface Props {
   images: string[];
@@ -58,7 +59,7 @@ export default function ImageManager({ images, onChange }: Props) {
               key={index}
               className="flex items-center gap-3 bg-zinc-50 border border-zinc-200 rounded-xl p-3"
             >
-              <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-zinc-200 shrink-0 border border-zinc-200">
+              <div className="relative w-32 h-32 rounded-xl overflow-hidden bg-zinc-200 shrink-0 border border-zinc-200 shadow-sm">
                 <Image
                   src={url}
                   alt={`Image ${index + 1}`}
@@ -102,7 +103,7 @@ export default function ImageManager({ images, onChange }: Props) {
                   title="Remove"
                   className="w-7 h-7 flex items-center justify-center rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 transition-all"
                 >
-                  ✕
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>

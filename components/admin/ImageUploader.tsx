@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import Cropper from "react-easy-crop";
+import { Trash2 } from "lucide-react";
 
 interface Point {
   x: number;
@@ -136,8 +137,8 @@ export default function ImageUploader({
       {images.length > 0 && (
         <div className={`grid gap-4 md:gap-6 ${
           maxImages === 1 
-            ? "grid-cols-1" 
-            : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+            ? "grid-cols-1 max-w-md mx-auto" 
+            : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3"
         }`}>
           {images.map((img, index) => (
             <div
@@ -156,9 +157,9 @@ export default function ImageUploader({
                  <button
                   type="button"
                   onClick={() => handleDelete(index)}
-                  className="bg-red-500/90 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-xl hover:bg-red-600 transition-all active:scale-90"
+                  className="bg-red-500 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-xl hover:bg-red-600 transition-all active:scale-90"
                 >
-                  <span className="text-xl">✕</span>
+                  <Trash2 className="w-5 h-5" />
                 </button>
               </div>
               {index === 0 && (

@@ -1,6 +1,6 @@
 // app/layout.tsx
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import Image from "next/image";
@@ -9,6 +9,12 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-playfair",
 });
 
 export const metadata: Metadata = {
@@ -68,7 +74,7 @@ export default function RootLayout({
 }) {
   return (
     <>
-      <div className="min-h-screen flex flex-col bg-linear-to-br from-zinc-50 via-white to-zinc-50 text-zinc-900 antialiased">
+    <div className={`${inter.variable} ${playfair.variable} min-h-screen flex flex-col bg-linear-to-br from-zinc-50 via-white to-zinc-50 text-zinc-900 antialiased font-sans`}>
         {/* PREMIUM NAVBAR */}
         <Navbar />
         <main className="flex-1">{children}</main>
@@ -99,6 +105,8 @@ export default function RootLayout({
                       alt="StylishBlazer Logo"
                       fill
                       className="object-contain"
+                      sizes="40px"
+                      unoptimized
                     />
                   </div>
                   <span className="text-base font-serif font-bold text-white tracking-wide">
@@ -160,7 +168,7 @@ export default function RootLayout({
               </div>
             </div>
 
-            <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 text-[10px] md:text-xs text-slate-500 tracking-widest uppercase md:flex-row">
+            <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 text-[10px] md:text-xs text-slate-400 tracking-widest uppercase md:flex-row">
               <p>
                 © {new Date().getFullYear()} StylishBlazer. All rights reserved.
               </p>

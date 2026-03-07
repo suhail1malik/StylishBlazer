@@ -79,6 +79,8 @@ export default function AdminNav({ user }: { user?: User }) {
                   alt="StylishBlazer Admin Logo"
                   fill
                   className="object-contain"
+                  sizes="(max-width: 768px) 32px, 40px"
+                  unoptimized
                 />
               </div>
               <div>
