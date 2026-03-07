@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
 
@@ -36,20 +36,15 @@ export default function HeroSlider({ products }: { products: Product[] }) {
     return Math.abs(offset) * velocity;
   };
 
-  const product = products[index];
+
 
   return (
-    <div className="relative overflow-hidden rounded-2xl shadow-2xl group touch-pan-y">
-      <AnimatePresence mode="wait" initial={false}>
+    <div className="relative overflow-hidden rounded-2xl shadow-2xl group touch-pan-y h-full">
+      <div className="h-full w-full">
         <motion.div
-          key={product.id}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={1}
+          dragElastic={0.2}
           onDragEnd={(e, { offset, velocity }) => {
             const swipe = swipePower(offset.x, velocity.x);
             if (swipe < -swipeConfidenceThreshold) {
@@ -58,27 +53,38 @@ export default function HeroSlider({ products }: { products: Product[] }) {
               prev();
             }
           }}
-          className="relative aspect-[4/5] cursor-grab active:cursor-grabbing"
+          animate={{ x: `-${index * 100}%` }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          className="flex h-full w-full cursor-grab active:cursor-grabbing"
         >
-          <Link href={`/products/${product.slug}`} className="block h-full w-full">
-            <Image
-              src={product.images[0]}
-              alt={product.name}
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-              priority
-            />
-
-            {/* cinematic overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-            <div className="absolute bottom-6 left-6 right-6 text-white text-shadow-sm">
-              <h3 className="font-serif font-bold text-lg md:text-2xl mb-1 line-clamp-1 italic tracking-tight">{product.name}</h3>
-              <p className="text-xs md:text-sm text-white/90 line-clamp-2 leading-relaxed max-w-[85%]">{product.shortDescription}</p>
+          {products.map((product) => (
+            <div key={product.id} className="relative min-w-full h-full">
+              <Link href={`/products/${product.slug}`} className="block h-full w-full">
+                <div className="relative aspect-[4/5] w-full h-full">
+                  <Image
+                    src={product.images[0]}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    priority
+                  />
+                  {/* cinematic overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  
+                  <div className="absolute bottom-6 left-6 right-6 text-white text-shadow-sm">
+                    <h3 className="font-serif font-bold text-lg md:text-2xl mb-1 line-clamp-1 italic tracking-tight">
+                      {product.name}
+                    </h3>
+                    <p className="text-xs md:text-sm text-white/90 line-clamp-2 leading-relaxed max-w-[85%]">
+                      {product.shortDescription}
+                    </p>
+                  </div>
+                </div>
+              </Link>
             </div>
-          </Link>
+          ))}
         </motion.div>
-      </AnimatePresence>
+      </div>
 
       {/* Navigation Arrows (Desktop) */}
       <button 
