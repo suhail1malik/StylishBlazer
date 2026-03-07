@@ -21,7 +21,7 @@ export default function cloudinaryLoader({
   // f_auto: best format
   // q_auto: best quality
   // c_limit,w_WIDTH: resize to width but don't upscale
-  const q = quality ? `q_${quality}` : "q_auto";
+  const q = quality ? `q_${quality}` : `q_auto`;
   const params = [`f_auto`, q, `c_limit`, `w_${width}`].join(",");
 
   // Replace '/upload/' with '/upload/params/'

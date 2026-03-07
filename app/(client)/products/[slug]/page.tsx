@@ -107,7 +107,7 @@ export default async function ProductPage({ params }: Props) {
     },
     "offers": {
       "@type": "Offer",
-      "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://stylishblazer.com"}/products/${slug}`,
+      "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://stylishblazer.in"}/products/${slug}`,
       "priceCurrency": "INR",
       "price": product.price,
       "availability": "https://schema.org/InStock",
@@ -257,7 +257,7 @@ export default async function ProductPage({ params }: Props) {
                 <ProductActions 
                   productName={product.name} 
                   productImage={product.images?.[0]}
-                  productUrl={`${process.env.NEXT_PUBLIC_BASE_URL || "https://stylishblazer.com"}/products/${product.slug}`}
+                  productUrl={`${process.env.NEXT_PUBLIC_BASE_URL || "https://stylishblazer.in"}/products/${product.slug}`}
                 />
               </div>
 
@@ -311,6 +311,7 @@ export default async function ProductPage({ params }: Props) {
                           alt={item.name}
                           fill
                           className="object-cover transition-transform duration-700 group-hover:scale-110"
+                          sizes="(max-width: 768px) 50vw, 25vw"
                         />
                       ) : (
                         <div className="h-full flex items-center justify-center text-5xl opacity-30">
