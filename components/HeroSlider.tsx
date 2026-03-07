@@ -61,14 +61,14 @@ export default function HeroSlider({ products }: { products: Product[] }) {
             <div key={product.id} className="relative min-w-full h-full">
               <Link href={`/products/${product.slug}`} className="block h-full w-full">
                 <div className="relative aspect-[4/5] w-full h-full">
-                  <Image
-                    src={product.images[0]}
-                    alt={product.name}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    priority
-                  />
+                    <Image
+                      src={product.images[0]}
+                      alt={product.name}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      priority
+                    />
                   {/* cinematic overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   
