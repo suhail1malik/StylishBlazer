@@ -48,7 +48,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
-        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="preconnect" href="https://res.cloudinary.com" />
       </head>
       <body className={`${inter.variable} ${playfair.variable} ${inter.className} overflow-x-hidden bg-slate-50 antialiased`}>
