@@ -21,7 +21,6 @@ export function Navbar() {
               fill
               className="object-contain transition-transform duration-500 group-hover:scale-110"
               sizes="(max-width: 768px) 40px, 48px"
-              unoptimized
               priority
             />
           </div>

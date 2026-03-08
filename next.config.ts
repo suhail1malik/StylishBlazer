@@ -20,6 +20,9 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'res.cloudinary.com' },
     ],
   },
+  experimental: {
+    optimizeCss: true,
+  },
 }
 
 export default nextConfig

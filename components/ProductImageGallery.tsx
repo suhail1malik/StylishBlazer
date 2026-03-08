@@ -36,6 +36,7 @@ export default function ProductImageGallery({
                 alt={`${productName} thumbnail ${i + 1}`}
                 fill
                 className="object-cover"
+                sizes="(max-width: 768px) 25vw, 100px"
               />
             </button>
           ))}
