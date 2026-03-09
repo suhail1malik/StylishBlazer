@@ -20,7 +20,6 @@ export default function EnquiryModal({
 }: EnquiryModalProps) {
   const [form, setForm] = useState({
     name: "",
-    email: "",
     phone: "",
     quantity: "",
     message: "",
@@ -46,7 +45,6 @@ export default function EnquiryModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
-          email: form.email,
           phone: form.phone,
           productName: productName,
           productImage: productImage,
@@ -57,7 +55,7 @@ export default function EnquiryModal({
       });
       if (!res.ok) throw new Error("Failed");
       setStatus("success");
-      setForm({ name: "", email: "", phone: "", quantity: "", message: "" });
+      setForm({ name: "", phone: "", quantity: "", message: "" });
     } catch {
       setStatus("error");
     }
@@ -129,20 +127,6 @@ export default function EnquiryModal({
                   value={form.name}
                   onChange={handleChange}
                   placeholder="Your full name"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="you@example.com"
                   className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>

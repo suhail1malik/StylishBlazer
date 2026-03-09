@@ -1,5 +1,5 @@
-// app/(client)/layout.tsx - Removed redundant font definitions
 import { Navbar } from "@/components/Navbar";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -65,6 +65,9 @@ export default function ClientLayout({
         {/* PREMIUM NAVBAR */}
         <Navbar />
         <main className="flex-1">{children}</main>
+
+        {/* WHATSAPP FLOAT */}
+        <WhatsAppButton />
 
         {/* Premium Dark Footer */}
         <footer 
@@ -149,8 +152,8 @@ export default function ClientLayout({
                 </h3>
                 <div className="flex flex-col gap-3 text-slate-400">
                   <p>Chandigarh, India</p>
-                  <p className="hover:text-white transition-colors cursor-pointer">+91-12345-67890</p>
-                  <p className="hover:text-white transition-colors cursor-pointer">sales@StylishBlazer.com</p>
+                  <p className="hover:text-white transition-colors cursor-pointer">+91 7906200663</p>
+                  <p className="hover:text-white transition-colors cursor-pointer">suhailmalik.dev@gmail.com</p>
                 </div>
               </div>
             </div>

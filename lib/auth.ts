@@ -7,6 +7,8 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production'
 );
 
+import { prisma } from './prisma';
+
 // Token expiry time
 const TOKEN_EXPIRY = '7d'; // 7 days
 
@@ -15,12 +17,12 @@ export type SessionPayload = {
   userId: string;
   email: string;
   name: string;
+  tokenVersion: number;
   expiresAt: Date;
 };
 
 /**
  * Create JWT token
- * Interview Point: "SignJWT se token create hota hai with payload and expiry"
  */
 export async function createToken(payload: Omit<SessionPayload, 'expiresAt'>) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
@@ -39,12 +41,11 @@ export async function createToken(payload: Omit<SessionPayload, 'expiresAt'>) {
 
 /**
  * Verify JWT token
- * Interview Point: "jwtVerify token ki authenticity check karta hai"
  */
 export async function verifyToken(token: string): Promise<SessionPayload | null> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
-    
+
     // Check if token is expired
     if (payload.expiresAt && new Date(payload.expiresAt as string) < new Date()) {
       return null;
@@ -58,23 +59,21 @@ export async function verifyToken(token: string): Promise<SessionPayload | null>
 
 /**
  * Set session cookie
- * Interview Point: "httpOnly cookie XSS attacks se bachata hai"
  */
 export async function setSessionCookie(token: string) {
   const cookieStore = await cookies();
-  
+
   cookieStore.set('session', token, {
-    httpOnly: true, // JavaScript se access nahi ho sakta (XSS protection)
-    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-    sameSite: 'lax', // CSRF protection
-    maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60,
     path: '/',
   });
 }
 
 /**
- * Get current session
- * Interview Point: "Server components mein direct cookie access kar sakte hain"
+ * Get current session with tokenVersion verification
  */
 export async function getSession(): Promise<SessionPayload | null> {
   const cookieStore = await cookies();
@@ -82,7 +81,24 @@ export async function getSession(): Promise<SessionPayload | null> {
 
   if (!token) return null;
 
-  return await verifyToken(token);
+  const payload = await verifyToken(token);
+  if (!payload) return null;
+
+  // DB verification for tokenVersion (Global Logout support)
+  try {
+    const user = await prisma.adminUser.findUnique({
+      where: { id: payload.userId },
+      select: { tokenVersion: true }
+    });
+
+    if (!user || user.tokenVersion !== payload.tokenVersion) {
+      return null;
+    }
+  } catch (error) {
+    return null;
+  }
+
+  return payload;
 }
 
 /**

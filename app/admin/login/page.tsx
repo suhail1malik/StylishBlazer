@@ -128,7 +128,7 @@ export default function AdminLogin() {
               Demo Credentials:
             </p>
             <p className="text-xs text-slate-500">
-              📧 admin@looklikestitches.com
+              📧 suhailmalik.dev@gmail.com
             </p>
             <p className="text-xs text-slate-500">🔑 admin123</p>
           </div>

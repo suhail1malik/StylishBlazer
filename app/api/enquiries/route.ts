@@ -11,7 +11,7 @@ const limiter = rateLimit({
 
 const enquirySchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
-  email: z.string().email("Invalid email address"),
+  email: z.string().email("Invalid email address").optional().nullable(),
   phone: z.string().min(10, "Phone number must be at least 10 digits").max(20),
   message: z.string().max(2000, "Message is too long").optional(),
   source: z.string().optional(),
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     const enquiry = await prisma.enquiry.create({
       data: {
         name: validatedData.name,
-        email: validatedData.email,
+        email: validatedData.email || null,
         phone: validatedData.phone,
         message: validatedData.message || "",
         source: validatedData.source || "general",
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
               <p><strong>Customer Details:</strong></p>
               <ul>
                 <li><strong>Name:</strong> ${name}</li>
-                <li><strong>Email:</strong> ${email}</li>
+                <li><strong>Email:</strong> ${email || 'Not provided'}</li>
                 <li><strong>Phone:</strong> ${phone}</li>
               </ul>
 

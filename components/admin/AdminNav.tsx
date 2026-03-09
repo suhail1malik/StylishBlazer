@@ -13,7 +13,8 @@ import {
   ChevronRight,
   Bell,
   Globe,
-  FileText
+  FileText,
+  Settings
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -54,6 +55,7 @@ export default function AdminNav({ user }: { user?: User }) {
     { href: "/admin/categories", label: "Categories", icon: <FolderTree className="w-4 h-4" /> },
     { href: "/admin/invoices", label: "Invoices", icon: <FileText className="w-4 h-4" /> },
     { href: "/admin/enquiries", label: "Enquiries", icon: <Mail className="w-4 h-4" />, badge: newEnquiryCount > 0 },
+    { href: "/admin/settings", label: "Settings", icon: <Settings className="w-4 h-4" /> },
   ];
 
   const handleLogout = async () => {

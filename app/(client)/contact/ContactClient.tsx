@@ -29,7 +29,6 @@ interface Category {
 export default function ContactClient() {
   const [form, setForm] = useState({
     name: "",
-    email: "",
     phone: "",
     productName: "",
     message: "",
@@ -66,7 +65,6 @@ export default function ContactClient() {
         setSuccess(true);
         setForm({
           name: "",
-          email: "",
           phone: "",
           productName: "",
           message: "",
@@ -134,8 +132,8 @@ export default function ContactClient() {
                     title: "Digital Inquiries",
                     content: (
                       <div className="flex flex-col gap-2">
-                        <a href="tel:+917906200663" className="hover:text-emerald-600 transition-colors">+91-79062-00663</a>
-                        <a href="mailto:sales@stylishblazer.in" className="hover:text-emerald-600 transition-colors">sales@stylishblazer.in</a>
+                        <a href="tel:+917906200663" className="hover:text-emerald-600 transition-colors">+91 7906200663</a>
+                        <a href="mailto:suhailmalik.dev@gmail.com" className="hover:text-emerald-600 transition-colors">suhailmalik.dev@gmail.com</a>
                       </div>
                     )
                   },
@@ -233,17 +231,6 @@ export default function ContactClient() {
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-[10px] uppercase font-bold tracking-widest text-slate-400 ml-1">Email Address</label>
-                      <input
-                        type="email"
-                        required
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        placeholder="excellence@brand.com"
-                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white focus:border-emerald-500/30 transition-all font-medium"
-                      />
-                    </div>
 
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase font-bold tracking-widest text-slate-400 ml-1">Collection Interest</label>

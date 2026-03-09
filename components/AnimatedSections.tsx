@@ -39,7 +39,7 @@ export function FadeIn({
       // ✅ FIX 2: y: 32 hataya - scroll/jump effect band hoga
       initial={{ opacity: 0 }}
       animate={isInView ? { opacity: 1 } : {}}
-      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.4, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
       {children}
@@ -67,7 +67,7 @@ export function StaggerGrid({
       animate={isInView ? "show" : "hidden"}
       variants={{
         hidden: {},
-        show: { transition: { staggerChildren: 0.12 } },
+        show: { transition: { staggerChildren: 0.05 } },
       }}
       className={className}
     >
@@ -83,7 +83,7 @@ export function StaggerItem({ children }: { children: React.ReactNode }) {
       variants={{
         // ✅ FIX 4: y: 28 hataya StaggerItem se bhi - consistent
         hidden: { opacity: 0 },
-        show: { opacity: 1, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
+        show: { opacity: 1, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } },
       }}
     >
       {children}
