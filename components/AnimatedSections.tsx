@@ -52,9 +52,11 @@ export function FadeIn({
 export function StaggerGrid({
   children,
   className = "",
+  stagger = 0.05,
 }: {
   children: React.ReactNode;
   className?: string;
+  stagger?: number;
 }) {
   const ref = useRef(null);
   // ✅ FIX 3: margin "0px" - consistent behaviour
@@ -67,7 +69,7 @@ export function StaggerGrid({
       animate={isInView ? "show" : "hidden"}
       variants={{
         hidden: {},
-        show: { transition: { staggerChildren: 0.05 } },
+        show: { transition: { staggerChildren: stagger } },
       }}
       className={className}
     >

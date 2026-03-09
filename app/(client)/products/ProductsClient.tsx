@@ -161,7 +161,7 @@ export default function ProductsPage({
 
         {/* Grid - Premium Light Cards */}
         {!loading && sorted.length > 0 && (
-          <StaggerGrid className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+          <StaggerGrid stagger={0} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
             {sorted.map((product) => (
               <StaggerItem key={product.id}>
                 <Link
