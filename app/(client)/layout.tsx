@@ -2,6 +2,7 @@ import { Navbar } from "@/components/Navbar";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import Image from "next/image";
 import Link from "next/link";
+import { Facebook, Instagram } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -152,8 +153,33 @@ export default function ClientLayout({
                 </h3>
                 <div className="flex flex-col gap-3 text-slate-400">
                   <p>Chandigarh, India</p>
-                  <p className="hover:text-white transition-colors cursor-pointer">+91 7906200663</p>
-                  <p className="hover:text-white transition-colors cursor-pointer">suhailmalik.dev@gmail.com</p>
+                  <a href="tel:+917500737345" className="hover:text-white transition-colors cursor-pointer">+91 7500737345</a>
+                  <a href="mailto:Jaatsarik091@gmail.com" className="hover:text-white transition-colors cursor-pointer">Jaatsarik091@gmail.com</a>
+                </div>
+              </div>
+
+              {/* Social */}
+              <div className="col-span-2 md:col-span-1 border-t border-white/5 pt-6 md:border-0 md:pt-0">
+                <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">
+                  Connect
+                </h3>
+                <div className="flex gap-4">
+                  <a 
+                    href="https://www.instagram.com/stylishblazer.in?igsh=MWY4MGw4N3ZwcThhcQ==&utm_source=ig_contact_invite" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white transition-all duration-300"
+                  >
+                    <Instagram className="w-5 h-5" />
+                  </a>
+                  <a 
+                    href="https://m.facebook.com/story.php?story_fbid=122099153475164744&substory_index=4234412313495080&id=61584942339883" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white transition-all duration-300"
+                  >
+                    <Facebook className="w-5 h-5" />
+                  </a>
                 </div>
               </div>
             </div>

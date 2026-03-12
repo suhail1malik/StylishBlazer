@@ -61,18 +61,18 @@ export function Navbar() {
         {/* CTA - Desktop */}
         <div className="hidden sm:flex items-center gap-4">
           <a
-            href="tel:+917906200663"
+            href="tel:+917500737345"
             className="flex items-center gap-2 rounded-xl bg-charcoal-900 px-6 py-3 text-[13px] font-bold text-white shadow-lg hover:shadow-glow-green hover:bg-brand-800 transition-all duration-300 hover:scale-105"
           >
             <Phone className="h-4 w-4 text-emerald-400" />
-            +91 7906200663
+            +91 7500737345
           </a>
         </div>
 
         {/* MOBILE CONTACT & MENU */}
         <div className="flex items-center gap-2 lg:hidden">
           <a
-            href="tel:+917906200663"
+            href="tel:+917500737345"
             className="flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-emerald-600 transition-colors hover:bg-emerald-100 border border-emerald-100/50 shadow-sm"
             aria-label="Call Now"
           >
@@ -120,11 +120,11 @@ export function Navbar() {
 
           <div className="pt-6 border-t border-zinc-50">
             <a
-              href="tel:+917906200663"
+              href="tel:+917500737345"
               className="flex items-center justify-center gap-3 rounded-xl bg-emerald-600 px-6 py-4 text-sm font-bold text-white shadow-md active:scale-95 transition-all"
             >
               <Phone className="h-4 w-4" />
-              Call +91 7906200663
+              Call +91 7500737345
             </a>
           </div>
         </div>

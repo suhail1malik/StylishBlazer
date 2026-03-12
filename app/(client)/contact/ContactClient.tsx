@@ -132,8 +132,8 @@ export default function ContactClient() {
                     title: "Digital Inquiries",
                     content: (
                       <div className="flex flex-col gap-2">
-                        <a href="tel:+917906200663" className="hover:text-emerald-600 transition-colors">+91 7906200663</a>
-                        <a href="mailto:suhailmalik.dev@gmail.com" className="hover:text-emerald-600 transition-colors">suhailmalik.dev@gmail.com</a>
+                        <a href="tel:+917500737345" className="hover:text-emerald-600 transition-colors">+91 7500737345</a>
+                        <a href="mailto:Jaatsarik091@gmail.com" className="hover:text-emerald-600 transition-colors">Jaatsarik091@gmail.com</a>
                       </div>
                     )
                   },
