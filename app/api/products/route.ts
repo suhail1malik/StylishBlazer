@@ -14,14 +14,15 @@ async function finalizeImages(images: string[]) {
 
   return Promise.all(images.map(async (url) => {
     if (url.includes('looklikestitches/temp/')) {
-      const publicId = url.match(/upload\/(?:v\d+\/)?(.+?)(?:\.[a-zA-Z]+)?$/)?.[1];
-      if (publicId) {
-        const newPublicId = publicId.replace('looklikestitches/temp/', 'looklikestitches/products/');
+        const publicIdMatch = url.match(/(looklikestitches\/temp\/[^\.]+)/);
+        const publicId = publicIdMatch ? publicIdMatch[1] : null;
+        if (publicId) {
+          const newPublicId = publicId.replace('looklikestitches/temp/', 'looklikestitches/products/');
         try {
-          const result = await cloudinary.uploader.rename(publicId, newPublicId, { invalidate: true });
+          const result = await cloudinary.uploader.rename(publicId, newPublicId, { invalidate: true, overwrite: true });
           return result.secure_url;
-        } catch (e) {
-          console.error("Failed to rename image in cloudinary", e);
+        } catch (e: any) {
+          console.error("Cloudinary rename failed for:", publicId, "Error Details:", e?.message || e);
           return url;
         }
       }

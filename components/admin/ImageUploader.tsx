@@ -112,21 +112,10 @@ export default function ImageUploader({
     }
   }
 
-  // Image delete karo Cloudinary se bhi
+  // Image delete karo UI se
   async function handleDelete(index: number) {
-    const img = images[index];
-    const confirmed = window.confirm("Is image ko delete karna chahte ho?");
+    const confirmed = window.confirm("Is image ko list se hatana chahte ho?");
     if (!confirmed) return;
-
-    try {
-      await fetch("/api/admin/upload", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ publicId: img.publicId }),
-      });
-    } catch {
-      // Delete fail hone pe bhi UI se hatao
-    }
 
     onChange(images.filter((_, i) => i !== index));
   }

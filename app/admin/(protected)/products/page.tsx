@@ -7,7 +7,6 @@ import {
   Eye, 
 } from "lucide-react";
 import ProductStudioClient from "./ProductStudioClient";
-import CleanupButton from "@/components/admin/CleanupButton";
 
 export default async function AdminProductsPage() {
   const [products, categories] = await Promise.all([
@@ -50,7 +49,6 @@ export default async function AdminProductsPage() {
             <Plus className="w-4 h-4 transition-transform group-hover:rotate-90" />
             Create New Article
           </Link>
-          <CleanupButton />
         </div>
       </div>
 

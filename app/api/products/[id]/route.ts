@@ -14,20 +14,27 @@ async function finalizeImages(images: string[]) {
 
   return Promise.all(images.map(async (url) => {
     if (url.includes('looklikestitches/temp/')) {
-      const publicId = url.match(/upload\/(?:v\d+\/)?(.+?)(?:\.[a-zA-Z]+)?$/)?.[1];
-      if (publicId) {
-        const newPublicId = publicId.replace('looklikestitches/temp/', 'looklikestitches/products/');
+        const publicIdMatch = url.match(/(looklikestitches\/temp\/[^\.]+)/);
+        const publicId = publicIdMatch ? publicIdMatch[1] : null;
+        if (publicId) {
+          const newPublicId = publicId.replace('looklikestitches/temp/', 'looklikestitches/products/');
         try {
-          const result = await cloudinary.uploader.rename(publicId, newPublicId, { invalidate: true });
+          const result = await cloudinary.uploader.rename(publicId, newPublicId, { invalidate: true, overwrite: true });
           return result.secure_url;
-        } catch (e) {
-          console.error("Failed to rename image in cloudinary", e);
+        } catch (e: any) {
+          console.error("Cloudinary rename failed for:", publicId, "Error Details:", e?.message || e);
           return url;
         }
       }
     }
     return url;
   }));
+}
+
+function extractPublicId(url: string): string | null {
+  if (!url) return null;
+  const match = url.match(/(looklikestitches\/(?:temp|products)\/[^\.]+)/);
+  return match ? match[1] : null;
 }
 
 
@@ -58,7 +65,25 @@ export async function PUT(
     const { id } = await params;
     const body = await req.json();
 
+    const oldProduct = await prisma.product.findUnique({ where: { id } });
+    if (!oldProduct) return NextResponse.json({ error: "Product not found" }, { status: 404 });
+
     const finalizedImages = await finalizeImages(body.images || []);
+
+    // Cleanup removed images from Cloudinary
+    const oldImages = oldProduct.images || [];
+    const imagesToDelete = oldImages.filter(img => !finalizedImages.includes(img) && img.includes('cloudinary.com'));
+    
+    for (const imgUrl of imagesToDelete) {
+      const publicId = extractPublicId(imgUrl);
+      if (publicId) {
+        try {
+          await cloudinary.uploader.destroy(publicId);
+        } catch (e) {
+          console.error(`Failed to delete orphaned image: ${publicId}`, e);
+        }
+      }
+    }
 
     const product = await prisma.product.update({
       where: { id },
@@ -99,6 +124,21 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+    const product = await prisma.product.findUnique({ where: { id } });
+    
+    if (product && product.images && product.images.length > 0) {
+      for (const imgUrl of product.images) {
+        const publicId = extractPublicId(imgUrl);
+        if (publicId) {
+          try {
+            await cloudinary.uploader.destroy(publicId);
+          } catch (e) {
+            console.error(`Failed to delete image during product delete: ${publicId}`, e);
+          }
+        }
+      }
+    }
+
     await prisma.product.delete({ where: { id } });
     revalidatePath('/')
     revalidatePath('/products')
