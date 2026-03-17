@@ -15,7 +15,7 @@ export default function ProductActions({
   productName,
   productImage,
   productUrl,
-  whatsappNumber = "917906200663",
+  whatsappNumber = "917500737345",
 }: ProductActionsProps) {
   const [modalOpen, setModalOpen] = useState(false);
 
